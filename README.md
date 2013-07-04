@@ -1,3 +1,3 @@
-# go-blog.md
+# tonyhb.co.uk
 
-A WIP markdown-based blogging engine in Go.
+The source for tonyhb.co.uk, using a WIP markdown-based blogging engine in Go.
