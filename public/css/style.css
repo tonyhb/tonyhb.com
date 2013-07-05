@@ -35,6 +35,8 @@ html, body, input, textarea { font: 200 16px/1.6 "Raleway", "Helvetica Neue", He
 #profile a { text-decoration: none; color: inherit; }
 #profile span { background: white; padding: 6px 10px; }
 
+#disqus_thread { margin-top: 2.5em; }
+
 .image { margin: 1.5em 0 0 0; }
 
 /* Typography */
@@ -55,7 +57,7 @@ pre { padding: 0.33em; overflow: auto; margin: 1.5em 0; }
 ol { list-style: decimal; margin-left: 2em; }
 
 /*Margins */
-p + h2, p + hr, hr + p { margin-top: 2.5em; }
+p + h2, p + hr, hr + p, .comment_separator { margin-top: 2.5em; }
 
 p + p, p + h3, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p { margin-top: 1.5em; }
 
