@@ -181,3 +181,7 @@ Sphinx bundles with [eight ranking algorithms explained in depth in this Sphinx 
 Check out the [Sphinx documentation on weighting](http://sphinxsearch.com/docs/2.0.4/weighting.html) and the [blog post about relevancy rankings](http://sphinxsearch.com/blog/2010/08/17/how-sphinx-relevance-ranking-works/) for more information.
 
 Hopefully this has helped you on your way to solve the problem of Magento search, and if you’ve completed the integration you’ll notice such a huge increase in search result relevancy you’ll be shocked. If you’ve got any feedback on this please feel free to leave a comment.
+
+<script>
+    var disqus_url = 'http://tonyhb.co.uk/2012/05/using-sphinx-within-magento-plus-optimising-search-result-rankings-weights-and-relevancy/';
+</script>
