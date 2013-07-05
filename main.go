@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/hoisie/mustache"
+	"github.com/kylelemons/go-gypsy/yaml"
 )
 
 var (
 	Posts postList
+	Config *yaml.File
 )
 
 func main() {
@@ -17,9 +19,20 @@ func main() {
 		panic("Couldn't read from the posts directory.")
 	}
 
+	// Open the YAML file and find out which
+	Config, err := yaml.ReadFile("config/go-blog.yaml")
+	if err != nil {
+		panic("Couldn't read the configuration file. Does `config/go-blog.yaml` exist?")
+	}
+	port, err := Config.Get("port")
+	if err != nil {
+		port = "8000"
+		fmt.Println("Couldn't find a port in the configuration. Using 8000")
+	}
+
 	http.HandleFunc("/favicon.ico", notFound) // @TODO: Handle the favicon separately: for now, 404 it.
 	http.HandleFunc("/", serve)
-	http.ListenAndServe(":8000", nil) // @TODO: Use YAML for config so the ports are changeable.
+	http.ListenAndServe(":" + port, nil)
 }
 
 // Accepts incoming requests, checks to see if a blog post exists with the
