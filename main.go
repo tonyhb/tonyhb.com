@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"github.com/hoisie/mustache"
 )
 
 var (
@@ -28,7 +29,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	var path string
 	if path = r.URL.Path[1:]; path == "" {
 		// Show the homepage
-		homepage(w, r)
+		homepage(w)
 		return
 	}
 
@@ -42,7 +43,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		// only scan the blog directory when we need to.
 		var err error
 		if Posts, err = Posts.scan(); err != nil {
-			internalError(w, r)
+			internalError(w)
 			return
 		}
 		// Now we can check if it exists again - if not, throw a 404.
@@ -52,35 +53,24 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	output, err := Posts.read(path)
-	if err != nil {
-		internalError(w, r)
-		return
-	}
-	fmt.Fprint(w, string(output))
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/view.html", "public/templates/layout.html", map[string]Post{"post":Posts[path]}))
 }
 
 // Handles 404 errors.
 func notFound(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
-	fmt.Fprint(w, "404")
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/errors/404.html", "public/templates/layout.html"))
 }
 
 // Handles internal server errors
-func internalError(w http.ResponseWriter, r *http.Request) {
+func internalError(w http.ResponseWriter) {
 	w.WriteHeader(500)
-	fmt.Fprint(w, "500")
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/errors/500.html", "public/templates/layout.html"))
 }
 
 // Lists the blog homepage
-func homepage(w http.ResponseWriter, r *http.Request) {
+func homepage(w http.ResponseWriter) {
 	list := Posts.list()
-
-	html := ""
-	for _, post := range list {
-		html = html + "<article><h1><a href='/" + post.Slug() + "'>" + post.title + "</a></h1><time>" + post.date.Month().String() + "</time>"
-	}
-
-	fmt.Fprint(w, html)
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/list.html", "public/templates/layout.html", map[string]interface{}{"posts":list}))
 	return
 }
