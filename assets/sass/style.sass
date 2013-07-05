@@ -65,7 +65,9 @@ html, body, input, textarea
 .image
   margin: 1.5em 0 0 0
   
-/** Typography **/
+/**
+ * Typography
+ **/
 h1, h1 a
   font-size: 26px
   font-weight: 700
@@ -85,6 +87,23 @@ h2
   font-weight: 700
   color: $lightBrown
 
+code, pre
+  font-family: monospace
+  font-size: 14px
+  background: #eee
+  padding: 3px
+  color: $mediumBrown
+pre
+  padding: .33em
+  overflow: auto
+  margin: 1.5em 0
+
+ol
+  list-style: decimal
+  margin-left: 2em
+
+/** Margins **/
+
 p + h2, p + hr, hr + p
   margin-top: 2.5em
 p + p, p + h3, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p
@@ -93,6 +112,8 @@ h2 + p, h3 + p, h4 + p, h5 + p, h6 + p
   margin-top: 1em
 hr + h2
   margin-top: 2em
+li + li
+  margin-top: .15em
 
 p a
   color: inherit
