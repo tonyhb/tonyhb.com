@@ -7,7 +7,7 @@ and there's always something to learn from it.
 My [new Go blog](https://github.com/tonyhb/tonyhb.co.uk) only took 7 hours to 
 build from 0 to release. it's extremely simple, and if you compare it to 
 something Wordpress it's almost featureless. But because it does what it needs 
-to and it does it well it doesn't bother me at all.
+to and&mdash;it does it well it&mdash;doesn't bother me at all.
 
 To have a product shipped **all that matters is that the core experience is 
 done well.** Everything else should be secondary. Whether you're working on a 
