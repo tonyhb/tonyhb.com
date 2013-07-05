@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 var (
@@ -83,11 +82,3 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, html)
 	return
 }
-
-// Creates a slug from the current title.
-func slug(input string) (output string) {
-	output = strings.Replace(input, " ", "-", -1)
-	output = strings.ToLower(output)
-	return
-}
-
