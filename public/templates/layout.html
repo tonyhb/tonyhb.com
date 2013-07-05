@@ -4,8 +4,25 @@
     <meta charset="utf-8">
     <title>{{title}}</title>
     <link rel="stylesheet" media="all" href="/public/css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Raleway:200,700' rel='stylesheet' type='text/css'>
   </head>
   <body>
-    {{{content}}}
+    <nav id="main_nav" class="hash" role="primary">
+      <ul class="container">
+        <li><a href="/">Home</a></li>
+      </ul>
+    </nav>
+    <div class="container">
+      <section id="main">
+        {{{content}}}
+      </section>
+      <aside id="right">
+        <div id="profile" class="hash">
+          <img src="/public/img/me@2x.png" alt="Tony Holdstock-Brown's Face" width="103" height="103">
+          <h2><span><a href="/">Tony Holdstock-Brown</a></span></h2>
+          <h3><span>Founder @ KeepUpdated.co</span></h3>
+        </div>
+      </aside>
+    </div>
   </body>
 </html>

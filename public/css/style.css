@@ -1,0 +1,58 @@
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font: inherit; font-size: 100%; vertical-align: baseline; }
+
+html { line-height: 1; }
+
+ol, ul { list-style: none; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+
+caption, th, td { text-align: left; font-weight: normal; vertical-align: middle; }
+
+q, blockquote { quotes: none; }
+q:before, q:after, blockquote:before, blockquote:after { content: ""; content: none; }
+
+a img { border: none; }
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary { display: block; }
+
+html, body, input, textarea { font: 200 16px/1.6 "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+.container { display: block; margin: 0 auto; width: 1000px; }
+
+.hash, #right { background-image: url(img/hash.png); }
+@media (min--moz-device-pixel-ratio: 1.3), (-o-min-device-pixel-ratio: 2.6 / 2), (-webkit-min-device-pixel-ratio: 1.3), (min-device-pixel-ratio: 1.3), (min-resolution: 1.3dppx) { .hash, #right { background-image: url("img/hash@2x.png"); background-size: 4px 4px; } }
+
+#main_nav { height: 30px; }
+#main_nav a { display: block; float: left; height: 30px; line-height: 34px; font-size: 14px; text-decoration: none; color: #676767; background: white; padding: 0 10px; }
+
+#main { padding: 80px 0; float: left; width: 627px; }
+
+#right { float: right; width: 317px; background-repeat: repeat-x; padding: 10px 0; }
+
+#profile { font-size: 14px; text-align: center; padding: 20px 0 25px 0; }
+#profile img { margin: 0 0 8px 0; }
+#profile h2 { font-weight: bold; color: #676767; }
+#profile a { text-decoration: none; color: inherit; }
+#profile span { background: white; padding: 6px 10px; }
+
+/*Typography */
+h1, h1 a { font-size: 26px; font-weight: 700; color: #3a301e; line-height: 1.2; text-decoration: none; }
+
+h1 a:hover { text-decoration: underline; }
+
+time { display: block; margin: 0 0 4em 0; }
+
+time + p { font-size: 20px; }
+
+h2 { font-weight: 700; color: #676767; }
+
+p + h2, p + hr, hr + p { margin-top: 2.5em; }
+
+p + p, p + h3, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p { margin-top: 1.5em; }
+
+h2 + p, h3 + p, h4 + p, h5 + p, h6 + p { margin-top: 1em; }
+
+b, strong, em, i { font-weight: 700; }
+
+hr { border: 0 none; height: 3px; background-image: url(img/hr.png); background-repeat: no-repeat; background-position: center 0; }
+@media (min--moz-device-pixel-ratio: 1.3), (-o-min-device-pixel-ratio: 2.6 / 2), (-webkit-min-device-pixel-ratio: 1.3), (min-device-pixel-ratio: 1.3), (min-resolution: 1.3dppx) { hr { background-image: url("img/hr@2x.png"); background-size: 23px 3px; } }
