@@ -30,19 +30,26 @@ func main() {
 		fmt.Println("Couldn't find a port in the configuration. Using 8000")
 	}
 
+	fmt.Println("Blog running on port", port)
+
 	http.HandleFunc("/favicon.ico", notFound) // @TODO: Handle the favicon separately: for now, 404 it.
 	http.HandleFunc("/", serve)
-	http.ListenAndServe(":" + port, nil)
+	http.ListenAndServe(":"+port, nil)
 }
 
 // Accepts incoming requests, checks to see if a blog post exists with the
 // given name converts the blogpost to HTML through mustache templates, if the
 // blog exists. If it doesn't, we show a 404.
 func serve(w http.ResponseWriter, r *http.Request) {
+	var err error
 	var path string
 	if path = r.URL.Path[1:]; path == "" {
 		// Show the homepage
-    Posts.scan();
+		Posts, err = Posts.scan()
+		if err != nil {
+			internalError(w)
+			return
+		}
 		homepage(w)
 		return
 	}

@@ -15,6 +15,8 @@ type Post struct {
 }
 
 func (this Post) Slug() (slug string) {
+	slug = strings.Replace(this.Title, ":", "-", -1)
+	slug = strings.Replace(this.Title, ",", "-", -1)
 	slug = strings.Replace(this.Title, " ", "-", -1)
 	slug = strings.ToLower(slug)
 	return
