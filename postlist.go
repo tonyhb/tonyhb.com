@@ -1,17 +1,16 @@
 package main
 
 import (
-	"time"
-	"io/ioutil"
 	"bytes"
 	"github.com/madari/goskirt"
+	"io/ioutil"
 )
 
 // Posts is a map of normalized URL strings to post title strings and last
 // modification timestamps for blog posts.
 // eg:
 //   "test-post" : { "title" : "Test Post", "date" : time.Time }
-type postList map[string]map[string]interface{}
+type postList map[string]Post
 
 // Scans the posts directory for markdown files and updates the list of blog
 // posts accordingly.
@@ -29,13 +28,12 @@ func (this postList) scan() (list postList, err error) {
 			continue
 		}
 
-		filename := file.Name()[:len(file.Name())-3]
-		path := slug(filename)
+		post := Post{
+			title: file.Name()[:len(file.Name())-3],
+			date:  file.ModTime(),
+		}
 
-		details := make(map[string]interface{})
-		details["title"] = filename // Use the filename without .md - this allows us to write clean lists for the homepage
-		details["date"] = file.ModTime()
-		list[path] = details
+		list[post.Slug()] = post
 	}
 
 	return
@@ -48,32 +46,29 @@ func (this postList) exists(path string) (ok bool) {
 }
 
 // Returns a slice of blog posts listed in date order
-func (this postList) list() (list []map[string]interface{}) {
+func (this postList) list() (list []Post) {
 	for _, post := range Posts {
-		// Create a map for the post title and date
-		listItem := make(map[string]interface{})
-		listItem["title"] = post["title"]
-		listItem["date"] = post["date"]
-
 		// We can add the first file without worrying about order
 		if len(list) == 0 {
-			list = append(list, listItem)
+			list = append(list, post)
 			continue
 		}
 
 		// We need to loop through the current list and add the item
 		// at the correct place, according to it's timestamp
 		for i, v := range list {
-			if post["date"].(time.Time).After(v["date"].(time.Time)) {
+			// This is newer than the current item in the list. Split the list 
+			// at this index (i), insert the post into the list and rebuild.
+			if post.date.After(v.date) {
 				a := list[0:i]
 				b := list[i:len(list)]
 
-				start := make([]map[string]interface{}, len(a))
-				end := make([]map[string]interface{}, len(b))
+				start := make([]Post, len(a))
+				end := make([]Post, len(b))
 				copy(start, a)
 				copy(end, b)
 
-				list = append(start, listItem)
+				list = append(start, post)
 				// We can't just append(start, end)
 				for _, v := range end {
 					list = append(list, v)
@@ -83,7 +78,7 @@ func (this postList) list() (list []map[string]interface{}) {
 
 			// This is the oldest blog post so far: add it to the end
 			if i == (len(list) - 1) {
-				list = append(list, listItem)
+				list = append(list, post)
 			}
 		}
 	}
@@ -94,7 +89,7 @@ func (this postList) list() (list []map[string]interface{}) {
 func (this postList) read(path string) (html []byte, err error) {
 	// Read the contents of our blog post
 	var contents []byte
-	contents, err = ioutil.ReadFile("posts/" + Posts[path]["title"].(string) + ".md")
+	contents, err = ioutil.ReadFile("posts/" + Posts[path].title + ".md")
 
 	markdown := goskirt.Goskirt{
 		goskirt.EXT_AUTOLINK | goskirt.EXT_STRIKETHROUGH,
@@ -105,4 +100,3 @@ func (this postList) read(path string) (html []byte, err error) {
 	markdown.WriteHTML(buffer, contents)
 	return buffer.Bytes(), nil
 }
-

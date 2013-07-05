@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 )
 
 var (
@@ -77,9 +76,8 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 	list := Posts.list()
 
 	html := ""
-	for _, item := range list {
-		time := item["date"].(time.Time)
-		html = html + "<article><h1><a href='/" + slug(item["title"].(string)) + "'>" + item["title"].(string) + "</a></h1><time>" + time.Month().String() + "</time>"
+	for _, post := range list {
+		html = html + "<article><h1><a href='/" + post.Slug() + "'>" + post.title + "</a></h1><time>" + post.date.Month().String() + "</time>"
 	}
 
 	fmt.Fprint(w, html)
