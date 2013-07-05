@@ -8,6 +8,7 @@
 $brown: #3a301e
 $mediumBrown: #3a301e
 $lightBrown: #676767
+$orange: #f27a22
 
 html, body, input, textarea
   font: 200 16px/1.6 "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif
@@ -87,6 +88,10 @@ p + p, p + h3, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p,
   margin-top: 1.5em
 h2 + p, h3 + p, h4 + p, h5 + p, h6 + p
   margin-top: 1em
+p a
+  color: inherit
+  &:hover
+    color: $orange
 
 b, strong, em, i
   font-weight: 700

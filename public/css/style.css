@@ -52,6 +52,9 @@ p + p, p + h3, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p,
 
 h2 + p, h3 + p, h4 + p, h5 + p, h6 + p { margin-top: 1em; }
 
+p a { color: inherit; }
+p a:hover { color: #f27a22; }
+
 b, strong, em, i { font-weight: 700; }
 
 hr { border: 0 none; height: 3px; background-image: url(img/hr.png); background-repeat: no-repeat; background-position: center 0; }
