@@ -29,6 +29,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	var path string
 	if path = r.URL.Path[1:]; path == "" {
 		// Show the homepage
+    Posts.scan();
 		homepage(w)
 		return
 	}
