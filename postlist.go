@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"github.com/madari/goskirt"
 	"io/ioutil"
 )
 
@@ -29,7 +27,7 @@ func (this postList) scan() (list postList, err error) {
 		}
 
 		post := Post{
-			title: file.Name()[:len(file.Name())-3],
+			Title: file.Name()[:len(file.Name())-3],
 			date:  file.ModTime(),
 		}
 
@@ -83,20 +81,4 @@ func (this postList) list() (list []Post) {
 		}
 	}
 	return
-}
-
-// Reads a markdown file and returns HTML given a URL path
-func (this postList) read(path string) (html []byte, err error) {
-	// Read the contents of our blog post
-	var contents []byte
-	contents, err = ioutil.ReadFile("posts/" + Posts[path].title + ".md")
-
-	markdown := goskirt.Goskirt{
-		goskirt.EXT_AUTOLINK | goskirt.EXT_STRIKETHROUGH,
-		goskirt.HTML_SMARTYPANTS,
-	}
-
-	buffer := bytes.NewBuffer([]byte{})
-	markdown.WriteHTML(buffer, contents)
-	return buffer.Bytes(), nil
 }
