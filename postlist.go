@@ -21,13 +21,14 @@ func (this postList) scan() (list postList, err error) {
 	}
 
 	for _, file := range dirContents {
+		nameLength := len(file.Name())
 		// Skip hidden files
-		if file.Name()[0] == '.' {
+		if file.Name()[0] == '.' || file.Name()[nameLength-3:nameLength] != ".md" {
 			continue
 		}
 
 		post := Post{
-			Title: file.Name()[:len(file.Name())-3],
+			Title: file.Name()[:nameLength-3],
 			date:  file.ModTime(),
 		}
 
@@ -55,7 +56,7 @@ func (this postList) list() (list []Post) {
 		// We need to loop through the current list and add the item
 		// at the correct place, according to it's timestamp
 		for i, v := range list {
-			// This is newer than the current item in the list. Split the list 
+			// This is newer than the current item in the list. Split the list
 			// at this index (i), insert the post into the list and rebuild.
 			if post.date.After(v.date) {
 				a := list[0:i]
