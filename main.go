@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"github.com/hoisie/mustache"
 	"github.com/kylelemons/go-gypsy/yaml"
+	"net/http"
 )
 
 var (
-	Posts postList
+	Posts  postList
 	Config *yaml.File
 )
 
@@ -74,7 +74,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/view.html", "public/templates/layout.html", map[string]Post{"post":Posts[path]}))
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/view.html", "public/templates/layout.html", map[string]Post{"post": Posts[path]}))
 }
 
 // Handles 404 errors.
@@ -92,6 +92,6 @@ func internalError(w http.ResponseWriter) {
 // Lists the blog homepage
 func homepage(w http.ResponseWriter) {
 	list := Posts.list()
-	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/list.html", "public/templates/layout.html", map[string]interface{}{"posts":list}))
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/list.html", "public/templates/layout.html", map[string]interface{}{"posts": list}))
 	return
 }
