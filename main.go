@@ -62,11 +62,13 @@ func serve(w http.ResponseWriter, r *http.Request) {
 
 // Handles 404 errors.
 func notFound(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
 	fmt.Fprint(w, "404")
 }
 
 // Handles internal server errors
 func internalError(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(500)
 	fmt.Fprint(w, "500")
 }
 
