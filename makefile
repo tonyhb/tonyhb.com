@@ -4,9 +4,10 @@ SASS_DIR = ./assets/sass
 CSS_DIR = ./public/css
 PID_FILE = .watchers
 
-all: build remove_js move_built_file
+all: build
 
 build: sass coffee require
+prod: sass coffee require remove_js move_built_file
 
 sass: 
 	@echo "Compiling SASS..."
@@ -21,21 +22,24 @@ require:
 	@`which r.js` -o build.js > /dev/null
 
 remove_js:
-	echo "Removing JS..."
+	@echo "Removing JS..."
 	@rm -rf ${JS_DIR}/collection
 	@rm -rf ${JS_DIR}/model
 	@rm -rf ${JS_DIR}/view
 	@rm -f ${JS_DIR}/*.js
 
 remove_css:
-	echo "Removing CSS..."
+	@echo "Removing CSS..."
 	@rm -f ${CSS_DIR}/*.css
 
 move_built_file:
+	@echo "Moving RequireJS optimized file..."
 	@mv app-built.js ${JS_DIR}/
 
 clean:
-	@rm "public/js/app-built.js"
+	@echo "RequireJS optimized file removed"
+	@rm -f "app-built.js"
+	@rm -f "public/js/app-built.js"
 
 watch:
 	@echo "Watching Coffee and SASS files"
