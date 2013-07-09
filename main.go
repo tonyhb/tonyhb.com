@@ -33,6 +33,8 @@ func main() {
 	fmt.Println("Blog running on port", port)
 
 	http.HandleFunc("/favicon.ico", notFound) // @TODO: Handle the favicon separately: for now, 404 it.
+	http.HandleFunc("/posts/", apiPost)
+	http.HandleFunc("/posts", apiList)
 	http.HandleFunc("/", serve)
 	http.ListenAndServe(":"+port, nil)
 }
@@ -74,7 +76,16 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/view.html", "public/templates/layout.html", map[string]Post{"post": Posts[path]}))
+	// Set the human readable date and our parsed markdown. We're calling
+	// exported struct methods here instead of mustache because, even though
+	// mustache can access them server-side, these methods *aren't* visible
+	// to Backbone/JS. We're using the same templates for the front and back
+	// end, so this is a necessity.
+	post := Posts[path]
+	post.Date = post.ParseDate()
+	post.Content = post.ParseContent()
+
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/view.html", "public/templates/layout.html", map[string]Post{"post": post}))
 }
 
 // Handles 404 errors.

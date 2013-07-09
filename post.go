@@ -1,31 +1,37 @@
 package main
 
 import (
+	"bytes"
 	"github.com/madari/goskirt"
+	"io/ioutil"
+	"regexp"
 	"strconv"
 	"strings"
-	"io/ioutil"
 	"time"
-	"bytes"
 )
 
 type Post struct {
-	Title string
-	date  time.Time
+	Title   string
+	Slug    string
+	Date    string
+	Content string `json:"Content,omitempty"`
+	date    time.Time
 }
 
-func (this Post) Slug() (slug string) {
-	slug = strings.Replace(this.Title, ":", "-", -1)
-	slug = strings.Replace(slug, ",", "", -1)
-	slug = strings.Replace(slug, ".", "", -1)
-	slug = strings.Replace(slug, " ", "-", -1)
-	slug = strings.Replace(slug, "!", "", -1)
-	slug = strings.Replace(slug, "?", "", -1)
+func (this Post) ParseSlug() (slug string) {
+	// Remove non-whitespace punctiation (except colon)
+	reg, _ := regexp.Compile("[,.!?]+")
+	slug = reg.ReplaceAllString(this.Title, "")
+
+	// Make everything else a dash
+	reg, _ = regexp.Compile("[^A-Za-z0-9]+")
+	slug = reg.ReplaceAllString(slug, "-")
+
 	slug = strings.ToLower(slug)
 	return
 }
 
-func (this Post) Date() string {
+func (this Post) ParseDate() string {
 	suffix := "th"
 	switch this.date.Day() {
 	case 1, 21, 31:
@@ -38,7 +44,7 @@ func (this Post) Date() string {
 	return strconv.Itoa(this.date.Day()) + suffix + " " + this.date.Month().String() + " " + strconv.Itoa(this.date.Year())
 }
 
-func (this Post) Content() string {
+func (this Post) ParseContent() string {
 	// Read the contents of our blog post
 	var contents []byte
 	contents, _ = ioutil.ReadFile("posts/" + this.Title + ".md")

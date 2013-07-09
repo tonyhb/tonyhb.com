@@ -31,8 +31,13 @@ func (this postList) scan() (list postList, err error) {
 			Title: file.Name()[:nameLength-3],
 			date:  file.ModTime(),
 		}
+		// Note that we're not parsing the markdown here: it's too slow, and 
+		// is only done on a post or API request
+		// @TODO: Refactor after the first version of the API is complete
+		post.Date = post.ParseDate()
+		post.Slug = post.ParseSlug()
 
-		list[post.Slug()] = post
+		list[post.Slug] = post
 	}
 
 	return
