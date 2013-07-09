@@ -1,6 +1,6 @@
 (function() {
   requirejs.config({
-    deps: ["main"],
+    deps: ["app"],
     paths: {
       modernizr: "libs/modernizr",
       jquery: "libs/jquery-1.10.1",
