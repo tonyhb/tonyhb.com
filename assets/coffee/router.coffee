@@ -21,7 +21,6 @@ define ["backbone", "app", "view/list", "view/post"], (Backbone, app, ListView, 
           $("#main").html(view.render())
 
     notFound: ->
-      # @TODO
-      alert "404 not found"
+      $("#main").html("<h1>404 Not Found</h1>");
   )
 
