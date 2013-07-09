@@ -27,6 +27,10 @@ remove_js:
 	@rm -rf ${JS_DIR}/view
 	@rm -f ${JS_DIR}/*.js
 
+remove_css:
+	echo "Removing CSS..."
+	@rm -f ${CSS_DIR}/*.css
+
 move_built_file:
 	@mv app-built.js ${JS_DIR}/
 
