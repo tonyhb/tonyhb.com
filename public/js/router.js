@@ -1,5 +1,5 @@
 (function() {
-  define(["backbone"], function(Backbone) {
+  define(["backbone", "app", "view/list", "view/post"], function(Backbone, app, ListView, PostView) {
     var Router;
     return Router = Backbone.Router.extend({
       routes: {
@@ -7,10 +7,32 @@
         ":post": "showPost"
       },
       showHome: function() {
-        return console.log("Homepage");
+        var view;
+        view = new ListView({
+          collection: app.posts
+        });
+        return $("#main").html(view.render());
       },
-      showPost: function(post) {
-        return console.log("Blog post: " + post);
+      showPost: function(href) {
+        var post;
+        post = app.posts.findWhere({
+          "Slug": href
+        });
+        if (post == null) {
+          return this.notFound();
+        }
+        return post.fetch({
+          success: function(model, response, options) {
+            var view;
+            view = new PostView({
+              model: model
+            });
+            return $("#main").html(view.render());
+          }
+        });
+      },
+      notFound: function() {
+        return alert("404 not found");
       }
     });
   });

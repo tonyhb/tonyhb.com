@@ -1,14 +1,12 @@
 (function() {
-  define(["modernizr", "backbone", "jquery", "router"], function(Modernizr, Backbone, $, Router) {
+  define(["modernizr", "backbone", "jquery", "collection/post"], function(Modernizr, Backbone, $, PostCollection) {
     var app;
     app = {
-      router: new Router,
-      init: function() {
+      posts: new PostCollection,
+      initialize: function() {
         var _this = this;
-        if (window.location.search.indexOf("debug=true") >= 0) {
-          if (window.app == null) {
-            window.app = this;
-          }
+        if (window.location.port === "8888" && (window.app == null)) {
+          window.app = this;
         }
         $(document).on("click", "a[href^='/']", function(event) {
           if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
@@ -21,15 +19,17 @@
           return false;
         });
         Backbone.history.start({
-          pushState: true
+          pushState: true,
+          silent: true
         });
-        this.init = function() {
+        this.posts.fetch();
+        this.initialize = function() {
           return this;
         };
         return this;
       }
     };
-    return app.init();
+    return app;
   });
 
 }).call(this);

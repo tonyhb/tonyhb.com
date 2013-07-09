@@ -1,11 +1,14 @@
 (function() {
   requirejs.config({
-    deps: ["app"],
+    deps: ["init"],
     paths: {
+      templates: "/public/templates",
       modernizr: "libs/modernizr",
       jquery: "libs/jquery-1.10.1",
       backbone: "libs/backbone",
-      underscore: "libs/underscore"
+      underscore: "libs/underscore",
+      mustache: "libs/mustache",
+      text: "libs/require-text"
     },
     shim: {
       backbone: {

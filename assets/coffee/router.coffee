@@ -1,4 +1,4 @@
-define ["backbone"], (Backbone) ->
+define ["backbone", "app", "view/list", "view/post"], (Backbone, app, ListView, PostView) ->
 
   Router = Backbone.Router.extend(
     routes:
@@ -6,9 +6,22 @@ define ["backbone"], (Backbone) ->
       ":post": "showPost"
 
     showHome: ->
-      console.log "Homepage"
+      # Render the list view using our posts.
+      view = new ListView(collection: app.posts)
+      $("#main").html(view.render())
 
-    showPost: (post) ->
-      console.log "Blog post: " + post
+    showPost: (href) ->
+      # Find the post from our collection
+      post = app.posts.findWhere "Slug": href
+      return @notFound() unless post?
+
+      post.fetch
+       success: (model, response, options) ->
+          view = new PostView(model: model)
+          $("#main").html(view.render())
+
+    notFound: ->
+      # @TODO
+      alert "404 not found"
   )
 
