@@ -23,7 +23,8 @@
         });
         Backbone.history.start({
           pushState: true,
-          silent: true
+          silent: true,
+          hashChange: false
         });
         this.posts.fetch();
         this.initialize = function() {

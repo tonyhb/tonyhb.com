@@ -22,8 +22,8 @@ define ["backbone", "jquery", "collection/post"], (Backbone, $, PostCollection) 
         event.preventDefault()
         return false
 
-      # Start backbone
-      Backbone.history.start pushState: true, silent: true
+      # Start backbone. Leave out IE7/8.
+      Backbone.history.start pushState: true, silent: true, hashChange: false
 
       # Download a list of posts
       @posts.fetch()
