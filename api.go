@@ -50,8 +50,7 @@ func apiPost(w http.ResponseWriter, r *http.Request) {
 
 func acceptOk(r *http.Request) bool {
 	// If this doesn't accept JSON, throw a not acceptable.
-	// ok := false
-	ok := true
+	ok := false
 	for _, e := range r.Header["Accept"] {
 		if strings.Index(e, "application/json") >= 0 {
 			ok = true;
