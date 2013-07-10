@@ -4,7 +4,6 @@ requirejs.config
     # Templates are separated
     templates: "/public/templates"
     # Libraries are all in the libs folder
-    modernizr: "libs/modernizr"
     jquery: "libs/jquery-1.10.1"
     backbone: "libs/backbone"
     underscore: "libs/underscore"

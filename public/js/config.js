@@ -3,7 +3,6 @@
     deps: ["init"],
     paths: {
       templates: "/public/templates",
-      modernizr: "libs/modernizr",
       jquery: "libs/jquery-1.10.1",
       backbone: "libs/backbone",
       underscore: "libs/underscore",

@@ -1,4 +1,4 @@
-define ["modernizr", "backbone", "jquery", "collection/post"], (Modernizr, Backbone, $, PostCollection) ->
+define ["backbone", "jquery", "collection/post"], (Backbone, $, PostCollection) ->
 
   app = 
     posts: new PostCollection
@@ -12,8 +12,13 @@ define ["modernizr", "backbone", "jquery", "collection/post"], (Modernizr, Backb
         # doesn't happen.
         return if event.altKey or event.ctrlKey or event.metaKey or event.shiftKey
 
+        # Remove the origin from the href (IE7 bug, and IE7 doesn't have
+        # window.location.origin)
+        regex = RegExp "http(s)?:\/\/" + window.location.host
+        href  = event.target.getAttribute("href").replace regex, ""
+
         # Navigate to the current link with Backbone
-        @router.navigate event.target.getAttribute("href"), trigger: true
+        @router.navigate href, trigger: true
         event.preventDefault()
         return false
 
