@@ -4,27 +4,20 @@
     <meta charset="utf-8">
     <title>{{title}}</title>
     <link rel="stylesheet" media="all" href="/public/css/style.css">
-    <link href='http://fonts.googleapis.com/css?family=Raleway:200,600,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Alegreya:400italic,400,700' rel='stylesheet' type='text/css'>
     <script src="/public/js/libs/modernizr.js"></script>
   </head>
   <body>
     <nav id="main_nav" class="hash" role="primary">
       <ul class="container">
         <li><a href="/">Home</a></li>
+        <li><a href="https://www.github.com/tonyhb">GitHub</a></li>
+        <li><a href="http://keepupdated.co">KeepUpdated</a></li>
       </ul>
     </nav>
-    <div class="container">
-      <section id="main">
-        {{{content}}}
-      </section>
-      <aside id="right">
-        <div id="profile" class="hash">
-          <img src="/public/img/me@2x.png" alt="Tony Holdstock-Brown's Face" width="103" height="103">
-          <h2><span><a href="/">Tony Holdstock-Brown</a></span></h2>
-          <h3><span>Founder @ KeepUpdated.co</span></h3>
-        </div>
-      </aside>
-    </div>
+    <section id="main">
+      {{{content}}}
+    </section>
     <script data-main="/public/js/app-built" src="/public/js/libs/require.js"></script>
     <script type="text/javascript">
       var _gaq = _gaq || [];
