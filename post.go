@@ -54,6 +54,11 @@ func (this Post) ParseContent() string {
 		goskirt.HTML_SMARTYPANTS,
 	}
 
+	// There's nothing in this file to return.
+	if len(contents) == 0 {
+		return ""
+	}
+
 	buffer := bytes.NewBuffer([]byte{})
 	markdown.WriteHTML(buffer, contents)
 	return string(buffer.Bytes())
