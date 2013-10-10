@@ -1,10 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hoisie/mustache"
 	"github.com/kylelemons/go-gypsy/yaml"
+
+	"fmt"
 	"net/http"
+	"time"
 )
 
 var (
@@ -29,6 +31,17 @@ func main() {
 		port = "8000"
 		fmt.Println("Couldn't find a port in the configuration. Using 8000")
 	}
+
+	// Run a goroutine which updates the postlists every minute,
+	go func() {
+		timer := time.NewTicker(time.Second)
+		for {
+			select {
+			case <- timer.C:
+				Posts, err = Posts.scan()
+			}
+		}
+	} ();
 
 	fmt.Println("Blog running on port", port)
 
