@@ -11,7 +11,7 @@ $lightBrown: #676767
 $orange: #f27a22
 
 html, body, input, textarea
-  font: 200 16px/1.6 "Alegreya", "Baskerville", Georgia, serif
+  font: 200 16px/1.7 "Lora", "Baskerville", Georgia, serif
 
 .container, #main
   display: block
@@ -90,48 +90,75 @@ time
   display: block
   text-align: center
   margin: 0 0 4em 0
+  color: #888
+
 time + p
-  font-size: 20px
+  font-size: 16px
+  margin-bottom: .85em
+
+small
+  color: #777
 
 h2
   font-weight: 700
-  color: $lightBrown
+  font-size: 20px
+  color: #777
+
+h3
+  font-weight: 700
+  margin-top: 3em
+  text-transform: uppercase
+  letter-spacing: 1px
+  color: #777
+
+h2, h3
+  text-align: center
 
 code, pre
   font-family: monospace
-  font-size: 14px
-  background: #eee
+  font-size: 12px !important
   padding: 3px
-  color: $mediumBrown
 pre
   padding: .33em
   overflow: auto
-  margin: 1.5em 0
+  margin: 1.5em 0 !important
+
+li code, p code
+  background: #fafee2
 
 ol
   list-style: decimal
   margin-left: 2em
 
+.callout
+  background: #ffffeb
+  padding: 25px
+
 /** Margins **/
 
 p + h2, p + hr, hr + p, .comment_separator
-  margin-top: 2.5em
-p + p, p + h3, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p
+  margin-top: 3em
+p + p, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p, .callout, .callout + p
   margin-top: 1.5em
 h2 + p, h3 + p, h4 + p, h5 + p, h6 + p
   margin-top: 1em
 hr + h2
   margin-top: 2em
 li + li
-  margin-top: .15em
+  margin-top: .55em
+li p + p
+  margin-top: .55em
 
 p a
   color: inherit
   &:hover
     color: $orange
 
-b, strong, em, i
+b, strong
   font-weight: 600
+
+em, i
+  font-style: italic
 
 
 .image-caption

@@ -11,39 +11,42 @@ SoundCloud
 In essence, your web app should import a package which acts as the service layer
 for your models. For me, the service layer looks like this:
 
-	type PageService interface {
-		Create(p *Page) error
-		Update(p *Page) error
-		// ...
-	}
+<pre><code data-language="go">type PageService interface {
+	Create(p *Page) error
+	Update(p *Page) error
+	// ...
+}
+</code></pre>
 
 You can then implement this interface with SQL-backed storage, or an in-memory
 storage for testing:
 
-	type LivePageService struct{}
-	
-	func (t LivePageService) Create(p *Page) (err error) {
-		// SQL methods here
-	}
-	
-	type MockPageService struct{}
-	
-	func (t MockPageService) Create(p *Page) (err error) {
-		// In memory methods here, used for testing the application code
-		// without having to worry about SQL code/database management
-	}
+<pre><code data-language="go">type LivePageService struct{}
+
+func (t LivePageService) Create(p *Page) (err error) {
+	// SQL methods here
+}
+
+type MockPageService struct{}
+
+func (t MockPageService) Create(p *Page) (err error) {
+	// In memory methods here, used for testing the application code
+	// without having to worry about SQL code/database management
+}
+</code></pre>
 
 Then, to get your service, I use a `GetPageService()` method to return a service
 for the current environment:
 
-	func GetPageService() PageService {
-		switch ENV {
-		case "DEV":
-			return MockPageService{}
-		case "TESTING", "LIVE":
-			return LivePageService{}
-		}
+<pre><code data-language="go">func GetPageService() PageService {
+	switch ENV {
+	case "DEV":
+		return MockPageService{}
+	case "TESTING", "LIVE":
+		return LivePageService{}
 	}
+}
+</code></pre>
 
 You can test SQL by directly creating a LivePageService{} and calling its
 methods, and the rest of the application uses the MockPageService{}, allowing

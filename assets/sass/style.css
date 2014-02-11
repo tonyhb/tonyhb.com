@@ -46,7 +46,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   display: block; }
 
 html, body, input, textarea {
-  font: 200 16px/1.7 "Lora", "Baskerville", Georgia, serif; }
+  font: 200 16px/1.6 "Alegreya", "Baskerville", Georgia, serif; }
 
 .container, #main {
   display: block;
@@ -128,57 +128,37 @@ h1 a:hover {
 time {
   display: block;
   text-align: center;
-  margin: 0 0 4em 0;
-  color: #888888; }
+  margin: 0 0 4em 0; }
 
 time + p {
-  font-size: 16px;
+  font-size: 18px;
   margin-bottom: 0.85em; }
-
-small {
-  color: #777777; }
 
 h2 {
   font-weight: 700;
-  font-size: 20px;
-  color: #777777; }
-
-h3 {
-  font-weight: 700;
-  margin-top: 3em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #777777; }
-
-h2, h3 {
-  text-align: center; }
+  color: #676767; }
 
 code, pre {
   font-family: monospace;
-  font-size: 12px !important;
-  padding: 3px; }
+  font-size: 14px;
+  background: #eeeeee;
+  padding: 3px;
+  color: #3a301e; }
 
 pre {
   padding: 0.33em;
   overflow: auto;
-  margin: 1.5em 0 !important; }
-
-li code, p code {
-  background: #fafee2; }
+  margin: 1.5em 0; }
 
 ol {
   list-style: decimal;
   margin-left: 2em; }
 
-.callout {
-  background: #ffffeb;
-  padding: 25px; }
-
 /*Margins */
 p + h2, p + hr, hr + p, .comment_separator {
-  margin-top: 3em; }
+  margin-top: 2.5em; }
 
-p + p, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p, .callout, .callout + p {
+p + p, p + h3, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p {
   margin-top: 1.5em; }
 
 h2 + p, h3 + p, h4 + p, h5 + p, h6 + p {
@@ -188,21 +168,15 @@ hr + h2 {
   margin-top: 2em; }
 
 li + li {
-  margin-top: 0.55em; }
-
-li p + p {
-  margin-top: 0.55em; }
+  margin-top: 0.15em; }
 
 p a {
   color: inherit; }
   p a:hover {
     color: #f27a22; }
 
-b, strong {
+b, strong, em, i {
   font-weight: 600; }
-
-em, i {
-  font-style: italic; }
 
 .image-caption {
   display: block;

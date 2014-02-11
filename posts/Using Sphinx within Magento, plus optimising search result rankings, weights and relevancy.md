@@ -120,7 +120,7 @@ Third, we ensured the product’s entity ID was passed to the helper in the `pre
 
 This is easier than it sounds and is included in the above Gist ([here’s the link again](https://gist.github.com/2727341)). The actual Sphinx logic starts at line 313 (line 56 of the Gist), in the method prepareResult:
 
-    define('SPH_RANK_SPH04', 7);
+<pre><code data-language="php">    define('SPH_RANK_SPH04', 7);
     define('SPH_RANK_WORDCOUNT', 3);
 
     // Connect to our Sphinx Search Engine and run our queries
@@ -161,7 +161,8 @@ This is easier than it sounds and is included in the above Gist ([here’s the l
             $this->_getWriteAdapter()->query($sql, $bind);
         }
     }
-
+</code></pre>
+ 
 (There are two definitions to Sphinx search ranking algorithms because in my Sphinx extension these weren’t defined.)
 
 The code replaces Magento’s search with Sphinx by connecting to the Sphinx server and running the query. We then loop through the results and ensure they’re added to the catalogsearch_result table with their relative weight.
