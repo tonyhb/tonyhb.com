@@ -2,20 +2,22 @@ package main
 
 import (
 	"bytes"
-	"github.com/madari/goskirt"
 	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/madari/goskirt"
 )
 
 type Post struct {
-	Title   string
-	Slug    string
-	Date    string
-	Content string `json:"Content,omitempty"`
-	date    time.Time
+	Title        string
+	Slug         string
+	Date         string
+	IsSummarized bool
+	Content      string `json:"Content,omitempty"`
+	date         time.Time
 }
 
 func (this Post) ParseSlug() (slug string) {

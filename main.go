@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/hoisie/mustache"
 	"github.com/kylelemons/go-gypsy/yaml"
+	log "github.com/sirupsen/logrus"
 
 	"fmt"
 	"net/http"
-	"time"
 )
 
 var (
@@ -15,35 +15,34 @@ var (
 )
 
 func main() {
+	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.JSONFormatter{})
+
 	// We're going to scan the blog
 	var err error
 	if Posts, err = Posts.scan(); err != nil {
-		panic("Couldn't read from the posts directory.")
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Panic("Couldn't read from the posts directory.")
 	}
 
 	// Open the YAML file and find out which
 	Config, err := yaml.ReadFile("config/go-blog.yaml")
 	if err != nil {
-		panic("Couldn't read the configuration file. Does `config/go-blog.yaml` exist?")
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Panic("Couldn't read the configuration file. Does `config/go-blog.yaml` exist?")
 	}
+
 	port, err := Config.Get("port")
 	if err != nil {
 		port = "8000"
-		fmt.Println("Couldn't find a port in the configuration. Using 8000")
+		log.Info("No port found in configuration. Using 8000")
 	}
 
-	// Run a goroutine which updates the postlists every minute,
-	go func() {
-		timer := time.NewTicker(time.Second)
-		for {
-			select {
-			case <- timer.C:
-				Posts, err = Posts.scan()
-			}
-		}
-	} ();
-
-	fmt.Println("Blog running on port", port)
+	log.WithFields(log.Fields{
+		"port": port,
+	}).Info("Starting blog")
 
 	http.HandleFunc("/favicon.ico", notFound) // @TODO: Handle the favicon separately: for now, 404 it.
 	http.HandleFunc("/posts/", apiPost)

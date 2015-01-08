@@ -1,7 +1,10 @@
 package main
 
 import (
+	log "github.com/sirupsen/logrus"
+
 	"io/ioutil"
+	"os"
 )
 
 // Posts is a map of normalized URL strings to post title strings and last
@@ -14,6 +17,8 @@ type postList map[string]Post
 // posts accordingly.
 func (this postList) scan() (list postList, err error) {
 	list = postList{}
+
+	log.Debug("Scanning ./posts")
 
 	dirContents, err := ioutil.ReadDir("./posts")
 	if err != nil {
@@ -31,7 +36,14 @@ func (this postList) scan() (list postList, err error) {
 			Title: file.Name()[:nameLength-3],
 			date:  file.ModTime(),
 		}
-		// Note that we're not parsing the markdown here: it's too slow, and 
+
+		if _, err := os.Stat("./posts/summaries/" + file.Name()); os.IsNotExist(err) {
+			post.IsSummarized = false
+		} else {
+			post.IsSummarized = true
+		}
+
+		// Note that we're not parsing the markdown here: it's too slow, and
 		// is only done on a post or API request
 		// @TODO: Refactor after the first version of the API is complete
 		post.Date = post.ParseDate()

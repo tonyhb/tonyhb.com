@@ -1,15 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"encoding/json"
 	"strings"
 )
 
 // Lists all posts in JSON for backbone
 func apiList(w http.ResponseWriter, r *http.Request) {
-	if ! acceptOk(r) {
+	if !acceptOk(r) {
 		w.WriteHeader(406)
 		return
 	}
@@ -29,7 +29,7 @@ func apiList(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiPost(w http.ResponseWriter, r *http.Request) {
-	if ! acceptOk(r) {
+	if !acceptOk(r) {
 		w.WriteHeader(406)
 		return
 	}
@@ -38,7 +38,7 @@ func apiPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("robots", "noindex")
 
 	// Find our post
-	path := r.URL.Path[7:];
+	path := r.URL.Path[7:]
 	list, _ := Posts.scan()
 	post := list[path]
 	post.Content = post.ParseContent()
@@ -53,8 +53,8 @@ func acceptOk(r *http.Request) bool {
 	ok := false
 	for _, e := range r.Header["Accept"] {
 		if strings.Index(e, "application/json") >= 0 {
-			ok = true;
-			break;
+			ok = true
+			break
 		}
 	}
 	return ok
