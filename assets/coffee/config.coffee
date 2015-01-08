@@ -1,5 +1,5 @@
 requirejs.config
-  deps: ["rainbow_go", "rainbow_js", "rainbow_php", "rainbow_generic", "rainbow_coffee",, "init"]
+  deps: ["rainbow_go", "rainbow_js", "rainbow_php", "rainbow_generic", "rainbow_coffee", "init"]
   paths:
     # Templates are separated
     templates: "/public/templates"

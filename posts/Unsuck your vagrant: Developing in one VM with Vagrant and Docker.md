@@ -5,7 +5,7 @@ tl;dr Why?
 2. Developing with Vagrant sucks - Chef/Puppet/Ansible is slow, VMs are huge, duplicated software/distros everywhere
 3. Docker brings the benefits of separate VM boxes within a single VM
 4. CoreOS has docker baked in, and will be perfect when production ready
-5. Developers rejoice! Coding and deployment will be a synch.
+5. Developers rejoice! Coding and deployment will be a cinch.
 
 Like me, you might (or might not) love developing in Vagrant. Using VMs for a project's 
 stack is incredible:  tools like Ansible mean your VM will always mirror the 
@@ -31,7 +31,7 @@ recommended Ubuntu vagrant file. Screw recommendations (with measure).
 
 CoreOS is an ambitious linux distro aimed at easy, scalable server
 deployments. **It's super lightweight, and it comes with Docker pre-installed.**
-It's aim is to make serving Docker-based apps a synch. This is why it's our
+It's aim is to make serving Docker-based apps a cinch. This is why it's our
 OS of choice - its skinny filesize and easy installation are also bonuses!
 Plus, I really wanted to test it.
 
@@ -61,8 +61,8 @@ Here's what you need to do:
 
 4. Note that *shared folders aren't enabled by default*.    
    Add these lines to your vagrant file to enable shared folders:   
-	<code>config.vm.network "private_network", ip: "10.1.2.3"</code>
-	<code>config.vm.synced_folder ".", "/home/core/share", id: "core", :nfs => true, :mount_options => ['nolock,vers=3,udp']</code> 
+	<code>config.vm.network "private\_network", ip: "10.1.2.3"</code>
+	<code>\*config.vm.synced\_folder ".", "/home/core/share", id: "core", :nfs => true, :mount\_options => ['nolock,vers=3,udp']\*</code> 
 
   <small>We've changed the IP address CoreOS gave us for the private network: the IP
   address they used is in the *public address space* (ie someone else's publicly
