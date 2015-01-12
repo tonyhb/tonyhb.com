@@ -4,64 +4,74 @@ import (
 	"bytes"
 	"io/ioutil"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
-
-	"github.com/madari/goskirt"
 )
 
-type Post struct {
-	Title        string
-	Slug         string
-	Date         string
-	IsSummarized bool
-	Content      string `json:"Content,omitempty"`
-	date         time.Time
-}
+// Given a filename and modification date create a fully parsed Post entry
+func NewPost(filename string, date time.Time) (p *Post, err error) {
+	p = &Post{
+		Title: filename,
+		Date:  date,
+	}
 
-func (this Post) ParseSlug() (slug string) {
-	// Remove non-whitespace punctiation (except colon)
-	reg, _ := regexp.Compile("[,.!?]+")
-	slug = reg.ReplaceAllString(this.Title, "")
-
-	// Make everything else a dash
-	reg, _ = regexp.Compile("[^A-Za-z0-9]+")
-	slug = reg.ReplaceAllString(slug, "-")
-
-	slug = strings.ToLower(slug)
+	p.ParseSlug()
+	err = p.ParseContent()
 	return
 }
 
-func (this Post) ParseDate() string {
-	suffix := "th"
-	switch this.date.Day() {
-	case 1, 21, 31:
-		suffix = "st"
-	case 2, 22:
-		suffix = "nd"
-	case 3, 23:
-		suffix = "rd"
-	}
-	return strconv.Itoa(this.date.Day()) + suffix + " " + this.date.Month().String() + " " + strconv.Itoa(this.date.Year())
+type Post struct {
+	Title        string // The filename is the title
+	Slug         string
+	Date         time.Time
+	IsSummarized bool
+	Content      string `json:"Content,omitempty"`
+	Summary      string `json:"Summary,omitempty"`
 }
 
-func (this Post) ParseContent() string {
-	// Read the contents of our blog post
-	var contents []byte
-	contents, _ = ioutil.ReadFile("posts/" + this.Title + ".md")
+func (p *Post) ParseSlug() (slug string) {
+	// Slugs can only include numbers, letters, hyphens and spaces.
+	// Capture and remove everything else
+	reg := regexp.MustCompile("(?:[^\\d\\w- ])+")
+	slug = reg.ReplaceAllString(p.Title, "")
 
-	markdown := goskirt.Goskirt{
-		goskirt.EXT_AUTOLINK | goskirt.EXT_STRIKETHROUGH,
-		goskirt.HTML_SMARTYPANTS,
+	// Convert all spaces to dashes
+	reg = regexp.MustCompile(" +")
+	slug = reg.ReplaceAllString(slug, "-")
+
+	slug = strings.ToLower(slug)
+
+	p.Slug = slug
+	return
+}
+
+// Parse the main blog content and the blog summary, if it exists.
+// This only returns an error if parsing the main content fails
+func (p *Post) ParseContent() error {
+	var err error
+	if p.Content, err = p.parseContent("posts/" + p.Title + ".md"); err != nil {
+		return err
 	}
+	p.Summary, err = p.parseContent("posts/summaries/" + p.Title + ".md")
+	p.IsSummarized = (err == nil)
+	return nil
+}
 
-	// There's nothing in this file to return.
-	if len(contents) == 0 {
-		return ""
+func (p Post) parseContent(filename string) (content string, err error) {
+	// Read the contents of our blog post
+	var data []byte
+
+	// No need to capture err: the length check below implicitly does this
+	data, err = ioutil.ReadFile(filename)
+
+	// There's nothing in the file to return.
+	if len(data) == 0 {
+		return
 	}
 
 	buffer := bytes.NewBuffer([]byte{})
-	markdown.WriteHTML(buffer, contents)
-	return string(buffer.Bytes())
+	markdown.WriteHTML(buffer, data)
+
+	content = string(buffer.Bytes())
+	return
 }
