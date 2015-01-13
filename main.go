@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hoisie/mustache"
 	"github.com/kylelemons/go-gypsy/yaml"
 	"github.com/madari/goskirt"
@@ -39,6 +41,8 @@ func init() {
 		goskirt.EXT_AUTOLINK | goskirt.EXT_STRIKETHROUGH,
 		goskirt.HTML_SMARTYPANTS,
 	}
+
+	go refresh()
 }
 
 func main() {
@@ -57,8 +61,26 @@ func main() {
 	http.HandleFunc("/favicon.ico", notFound) // @TODO: Handle the favicon separately: for now, 404 it.
 	http.HandleFunc("/posts/", apiPost)
 	http.HandleFunc("/posts", apiList)
+	http.HandleFunc("/assets/", assets)
 	http.HandleFunc("/", serve)
 	http.ListenAndServe(":"+port, nil)
+}
+
+// Refresh the post list every minute
+// @TODO: Make this length configurable
+func refresh() {
+	c := time.Tick(1 * time.Minute)
+	for _ = range c {
+		if err := posts.Scan(); err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Warn("Error refreshing posts list")
+		}
+	}
+}
+
+func assets(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./public"+r.URL.Path)
 }
 
 // Accepts incoming requests, checks to see if a blog post exists with the
