@@ -805,6 +805,7 @@
 	
 	            bypass_defaults[language] = bypass;
 	            language_patterns[language] = patterns.concat(language_patterns[language] || []);
+	            console.log(language_patterns);
 	        },
 	
 	        /**

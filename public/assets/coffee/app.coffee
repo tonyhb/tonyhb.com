@@ -7,6 +7,7 @@ Radio      = require('radio')
 # Init includes
 require('init/marionette')
 require('init/routing')
+require('init/rainbow')
 
 # App includes
 require('blog/app')

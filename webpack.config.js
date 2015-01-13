@@ -51,6 +51,7 @@ module.exports = {
       rainbow_javascript: __dirname + "/public/assets/libs/rainbow.javascript.js",
       rainbow_php:        __dirname + "/public/assets/libs/rainbow.php.js",
       rainbow_shell:      __dirname + "/public/assets/libs/rainbow.shell.js",
+      rainbow_ruby:       __dirname + "/public/assets/libs/rainbow.ruby.js",
     }
   }
 };

@@ -1,5 +1,6 @@
 M = require('marionette')
 Radio = require('radio')
+Rainbow = require('exports?Rainbow!rainbow')
 tpl = require('html!blog/html/postItemView.html')
 disqusTpl = require('html!blog/html/disqus.html')
 
@@ -20,6 +21,7 @@ module.exports = M.ItemView.extend
   onShow: ->
     @ui.toggleMode.removeClass('hidden') if @model.get('IsSummarized') is true
     @restartDisqus()
+    Rainbow.color()
 
   restartDisqus: ->
     slug = @model.get('Slug')
