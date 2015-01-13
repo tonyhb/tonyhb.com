@@ -41,7 +41,7 @@ module.exports = {
       marionette:         __dirname + "/public/assets/libs/backbone.marionette.js",
       backbone:           __dirname + "/public/assets/libs/backbone.js",
       underscore:         __dirname + "/public/assets/libs/lodash.underscore.js",
-      jquery:             __dirname + "/public/assets/libs/jquery-2.1.1.js",
+      jquery:             __dirname + "/public/assets/libs/jquery-2.1.3.js",
       "$serialize":       __dirname + "/public/assets/libs/jquery.serialize-object.js",
       radio:              __dirname + "/public/assets/libs/backbone.radio.js",
       mustache:           __dirname + "/public/assets/libs/mustache.js",

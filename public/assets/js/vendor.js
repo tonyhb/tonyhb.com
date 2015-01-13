@@ -58,12 +58,12 @@
 /***/ },
 /* 1 */
 /*!********************************************!*\
-  !*** ./public/assets/libs/jquery-2.1.1.js ***!
+  !*** ./public/assets/libs/jquery-2.1.3.js ***!
   \********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	 * jQuery JavaScript Library v2.1.1
+	 * jQuery JavaScript Library v2.1.3
 	 * http://jquery.com/
 	 *
 	 * Includes Sizzle.js
@@ -73,19 +73,19 @@
 	 * Released under the MIT license
 	 * http://jquery.org/license
 	 *
-	 * Date: 2014-05-01T17:11Z
+	 * Date: 2014-12-18T15:11Z
 	 */
 	
 	(function( global, factory ) {
 	
 		if ( typeof module === "object" && typeof module.exports === "object" ) {
-			// For CommonJS and CommonJS-like environments where a proper window is present,
-			// execute the factory and get jQuery
-			// For environments that do not inherently posses a window with a document
-			// (such as Node.js), expose a jQuery-making factory as module.exports
-			// This accentuates the need for the creation of a real window
+			// For CommonJS and CommonJS-like environments where a proper `window`
+			// is present, execute the factory and get jQuery.
+			// For environments that do not have a `window` with a `document`
+			// (such as Node.js), expose a factory as module.exports.
+			// This accentuates the need for the creation of a real `window`.
 			// e.g. var jQuery = require("jquery")(window);
-			// See ticket #14549 for more info
+			// See ticket #14549 for more info.
 			module.exports = global.document ?
 				factory( global, true ) :
 				function( w ) {
@@ -101,10 +101,10 @@
 	// Pass this if window is not defined yet
 	}(typeof window !== "undefined" ? window : this, function( window, noGlobal ) {
 	
-	// Can't do this because several apps including ASP.NET trace
+	// Support: Firefox 18+
+	// Can't be in strict mode, several libs including ASP.NET trace
 	// the stack via arguments.caller.callee and Firefox dies if
 	// you try to trace through "use strict" call chains. (#13335)
-	// Support: Firefox 18+
 	//
 	
 	var arr = [];
@@ -131,7 +131,7 @@
 		// Use the correct document accordingly with window argument (sandbox)
 		document = window.document,
 	
-		version = "2.1.1",
+		version = "2.1.3",
 	
 		// Define a local copy of jQuery
 		jQuery = function( selector, context ) {
@@ -249,7 +249,7 @@
 		if ( typeof target === "boolean" ) {
 			deep = target;
 	
-			// skip the boolean and the target
+			// Skip the boolean and the target
 			target = arguments[ i ] || {};
 			i++;
 		}
@@ -259,7 +259,7 @@
 			target = {};
 		}
 	
-		// extend jQuery itself if only one argument is passed
+		// Extend jQuery itself if only one argument is passed
 		if ( i === length ) {
 			target = this;
 			i--;
@@ -316,9 +316,6 @@
 	
 		noop: function() {},
 	
-		// See test/unit/core.js for details concerning isFunction.
-		// Since version 1.3, DOM methods and functions like alert
-		// aren't supported. They return false on IE (#2968).
 		isFunction: function( obj ) {
 			return jQuery.type(obj) === "function";
 		},
@@ -333,7 +330,8 @@
 			// parseFloat NaNs numeric-cast false positives (null|true|false|"")
 			// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
 			// subtraction forces infinities to NaN
-			return !jQuery.isArray( obj ) && obj - parseFloat( obj ) >= 0;
+			// adding 1 corrects loss of precision from parseFloat (#15100)
+			return !jQuery.isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
 		},
 	
 		isPlainObject: function( obj ) {
@@ -367,7 +365,7 @@
 			if ( obj == null ) {
 				return obj + "";
 			}
-			// Support: Android < 4.0, iOS < 6 (functionish RegExp)
+			// Support: Android<4.0, iOS<6 (functionish RegExp)
 			return typeof obj === "object" || typeof obj === "function" ?
 				class2type[ toString.call(obj) ] || "object" :
 				typeof obj;
@@ -397,6 +395,7 @@
 		},
 	
 		// Convert dashed to camelCase; used by the css and data modules
+		// Support: IE9-11+
 		// Microsoft forgot to hump their vendor prefix (#9572)
 		camelCase: function( string ) {
 			return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
@@ -612,14 +611,14 @@
 	}
 	var Sizzle =
 	/*!
-	 * Sizzle CSS Selector Engine v1.10.19
+	 * Sizzle CSS Selector Engine v2.2.0-pre
 	 * http://sizzlejs.com/
 	 *
-	 * Copyright 2013 jQuery Foundation, Inc. and other contributors
+	 * Copyright 2008, 2014 jQuery Foundation, Inc. and other contributors
 	 * Released under the MIT license
 	 * http://jquery.org/license
 	 *
-	 * Date: 2014-04-18
+	 * Date: 2014-12-16
 	 */
 	(function( window ) {
 	
@@ -646,7 +645,7 @@
 		contains,
 	
 		// Instance-specific data
-		expando = "sizzle" + -(new Date()),
+		expando = "sizzle" + 1 * new Date(),
 		preferredDoc = window.document,
 		dirruns = 0,
 		done = 0,
@@ -661,7 +660,6 @@
 		},
 	
 		// General-purpose constants
-		strundefined = typeof undefined,
 		MAX_NEGATIVE = 1 << 31,
 	
 		// Instance methods
@@ -671,12 +669,13 @@
 		push_native = arr.push,
 		push = arr.push,
 		slice = arr.slice,
-		// Use a stripped-down indexOf if we can't use a native one
-		indexOf = arr.indexOf || function( elem ) {
+		// Use a stripped-down indexOf as it's faster than native
+		// http://jsperf.com/thor-indexof-vs-for/5
+		indexOf = function( list, elem ) {
 			var i = 0,
-				len = this.length;
+				len = list.length;
 			for ( ; i < len; i++ ) {
-				if ( this[i] === elem ) {
+				if ( list[i] === elem ) {
 					return i;
 				}
 			}
@@ -716,6 +715,7 @@
 			")\\)|)",
 	
 		// Leading and non-escaped trailing whitespace, capturing some non-whitespace characters preceding the latter
+		rwhitespace = new RegExp( whitespace + "+", "g" ),
 		rtrim = new RegExp( "^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" + whitespace + "+$", "g" ),
 	
 		rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*" ),
@@ -767,6 +767,14 @@
 					String.fromCharCode( high + 0x10000 ) :
 					// Supplemental Plane codepoint (surrogate pair)
 					String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
+		},
+	
+		// Used for iframes
+		// See setDocument()
+		// Removing the function wrapper causes a "Permission Denied"
+		// error in IE
+		unloadHandler = function() {
+			setDocument();
 		};
 	
 	// Optimize for push.apply( _, NodeList )
@@ -809,19 +817,18 @@
 	
 		context = context || document;
 		results = results || [];
+		nodeType = context.nodeType;
 	
-		if ( !selector || typeof selector !== "string" ) {
+		if ( typeof selector !== "string" || !selector ||
+			nodeType !== 1 && nodeType !== 9 && nodeType !== 11 ) {
+	
 			return results;
 		}
 	
-		if ( (nodeType = context.nodeType) !== 1 && nodeType !== 9 ) {
-			return [];
-		}
+		if ( !seed && documentIsHTML ) {
 	
-		if ( documentIsHTML && !seed ) {
-	
-			// Shortcuts
-			if ( (match = rquickExpr.exec( selector )) ) {
+			// Try to shortcut find operations when possible (e.g., not under DocumentFragment)
+			if ( nodeType !== 11 && (match = rquickExpr.exec( selector )) ) {
 				// Speed-up: Sizzle("#ID")
 				if ( (m = match[1]) ) {
 					if ( nodeType === 9 ) {
@@ -853,7 +860,7 @@
 					return results;
 	
 				// Speed-up: Sizzle(".CLASS")
-				} else if ( (m = match[3]) && support.getElementsByClassName && context.getElementsByClassName ) {
+				} else if ( (m = match[3]) && support.getElementsByClassName ) {
 					push.apply( results, context.getElementsByClassName( m ) );
 					return results;
 				}
@@ -863,7 +870,7 @@
 			if ( support.qsa && (!rbuggyQSA || !rbuggyQSA.test( selector )) ) {
 				nid = old = expando;
 				newContext = context;
-				newSelector = nodeType === 9 && selector;
+				newSelector = nodeType !== 1 && selector;
 	
 				// qSA works strangely on Element-rooted queries
 				// We can work around this by specifying an extra ID on the root
@@ -1050,7 +1057,7 @@
 	 * @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
 	 */
 	function testContext( context ) {
-		return context && typeof context.getElementsByTagName !== strundefined && context;
+		return context && typeof context.getElementsByTagName !== "undefined" && context;
 	}
 	
 	// Expose support vars for convenience
@@ -1074,9 +1081,8 @@
 	 * @returns {Object} Returns the current document
 	 */
 	setDocument = Sizzle.setDocument = function( node ) {
-		var hasCompare,
-			doc = node ? node.ownerDocument || node : preferredDoc,
-			parent = doc.defaultView;
+		var hasCompare, parent,
+			doc = node ? node.ownerDocument || node : preferredDoc;
 	
 		// If no document and documentElement is available, return
 		if ( doc === document || doc.nodeType !== 9 || !doc.documentElement ) {
@@ -1086,9 +1092,7 @@
 		// Set our document
 		document = doc;
 		docElem = doc.documentElement;
-	
-		// Support tests
-		documentIsHTML = !isXML( doc );
+		parent = doc.defaultView;
 	
 		// Support: IE>8
 		// If iframe document is assigned to "document" variable and if iframe has been reloaded,
@@ -1097,21 +1101,22 @@
 		if ( parent && parent !== parent.top ) {
 			// IE11 does not have attachEvent, so all must suffer
 			if ( parent.addEventListener ) {
-				parent.addEventListener( "unload", function() {
-					setDocument();
-				}, false );
+				parent.addEventListener( "unload", unloadHandler, false );
 			} else if ( parent.attachEvent ) {
-				parent.attachEvent( "onunload", function() {
-					setDocument();
-				});
+				parent.attachEvent( "onunload", unloadHandler );
 			}
 		}
+	
+		/* Support tests
+		---------------------------------------------------------------------- */
+		documentIsHTML = !isXML( doc );
 	
 		/* Attributes
 		---------------------------------------------------------------------- */
 	
 		// Support: IE<8
-		// Verify that getAttribute really returns attributes and not properties (excepting IE8 booleans)
+		// Verify that getAttribute really returns attributes and not properties
+		// (excepting IE8 booleans)
 		support.attributes = assert(function( div ) {
 			div.className = "i";
 			return !div.getAttribute("className");
@@ -1126,17 +1131,8 @@
 			return !div.getElementsByTagName("*").length;
 		});
 	
-		// Check if getElementsByClassName can be trusted
-		support.getElementsByClassName = rnative.test( doc.getElementsByClassName ) && assert(function( div ) {
-			div.innerHTML = "<div class='a'></div><div class='a i'></div>";
-	
-			// Support: Safari<4
-			// Catch class over-caching
-			div.firstChild.className = "i";
-			// Support: Opera<10
-			// Catch gEBCN failure to find non-leading classes
-			return div.getElementsByClassName("i").length === 2;
-		});
+		// Support: IE<9
+		support.getElementsByClassName = rnative.test( doc.getElementsByClassName );
 	
 		// Support: IE<10
 		// Check if getElementById returns elements by name
@@ -1150,7 +1146,7 @@
 		// ID find and filter
 		if ( support.getById ) {
 			Expr.find["ID"] = function( id, context ) {
-				if ( typeof context.getElementById !== strundefined && documentIsHTML ) {
+				if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
 					var m = context.getElementById( id );
 					// Check parentNode to catch when Blackberry 4.6 returns
 					// nodes that are no longer in the document #6963
@@ -1171,7 +1167,7 @@
 			Expr.filter["ID"] =  function( id ) {
 				var attrId = id.replace( runescape, funescape );
 				return function( elem ) {
-					var node = typeof elem.getAttributeNode !== strundefined && elem.getAttributeNode("id");
+					var node = typeof elem.getAttributeNode !== "undefined" && elem.getAttributeNode("id");
 					return node && node.value === attrId;
 				};
 			};
@@ -1180,14 +1176,20 @@
 		// Tag
 		Expr.find["TAG"] = support.getElementsByTagName ?
 			function( tag, context ) {
-				if ( typeof context.getElementsByTagName !== strundefined ) {
+				if ( typeof context.getElementsByTagName !== "undefined" ) {
 					return context.getElementsByTagName( tag );
+	
+				// DocumentFragment nodes don't have gEBTN
+				} else if ( support.qsa ) {
+					return context.querySelectorAll( tag );
 				}
 			} :
+	
 			function( tag, context ) {
 				var elem,
 					tmp = [],
 					i = 0,
+					// By happy coincidence, a (broken) gEBTN appears on DocumentFragment nodes too
 					results = context.getElementsByTagName( tag );
 	
 				// Filter out possible comments
@@ -1205,7 +1207,7 @@
 	
 		// Class
 		Expr.find["CLASS"] = support.getElementsByClassName && function( className, context ) {
-			if ( typeof context.getElementsByClassName !== strundefined && documentIsHTML ) {
+			if ( documentIsHTML ) {
 				return context.getElementsByClassName( className );
 			}
 		};
@@ -1234,13 +1236,15 @@
 				// setting a boolean content attribute,
 				// since its presence should be enough
 				// http://bugs.jquery.com/ticket/12359
-				div.innerHTML = "<select msallowclip=''><option selected=''></option></select>";
+				docElem.appendChild( div ).innerHTML = "<a id='" + expando + "'></a>" +
+					"<select id='" + expando + "-\f]' msallowcapture=''>" +
+					"<option selected=''></option></select>";
 	
 				// Support: IE8, Opera 11-12.16
 				// Nothing should be selected when empty strings follow ^= or $= or *=
 				// The test attribute must be unknown in Opera but "safe" for WinRT
 				// http://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section
-				if ( div.querySelectorAll("[msallowclip^='']").length ) {
+				if ( div.querySelectorAll("[msallowcapture^='']").length ) {
 					rbuggyQSA.push( "[*^$]=" + whitespace + "*(?:''|\"\")" );
 				}
 	
@@ -1250,11 +1254,23 @@
 					rbuggyQSA.push( "\\[" + whitespace + "*(?:value|" + booleans + ")" );
 				}
 	
+				// Support: Chrome<29, Android<4.2+, Safari<7.0+, iOS<7.0+, PhantomJS<1.9.7+
+				if ( !div.querySelectorAll( "[id~=" + expando + "-]" ).length ) {
+					rbuggyQSA.push("~=");
+				}
+	
 				// Webkit/Opera - :checked should return selected option elements
 				// http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
 				// IE8 throws error here and will not see later tests
 				if ( !div.querySelectorAll(":checked").length ) {
 					rbuggyQSA.push(":checked");
+				}
+	
+				// Support: Safari 8+, iOS 8+
+				// https://bugs.webkit.org/show_bug.cgi?id=136851
+				// In-page `selector#id sibing-combinator selector` fails
+				if ( !div.querySelectorAll( "a#" + expando + "+*" ).length ) {
+					rbuggyQSA.push(".#.+[+~]");
 				}
 			});
 	
@@ -1372,7 +1388,7 @@
 	
 				// Maintain original order
 				return sortInput ?
-					( indexOf.call( sortInput, a ) - indexOf.call( sortInput, b ) ) :
+					( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
 					0;
 			}
 	
@@ -1399,7 +1415,7 @@
 					aup ? -1 :
 					bup ? 1 :
 					sortInput ?
-					( indexOf.call( sortInput, a ) - indexOf.call( sortInput, b ) ) :
+					( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
 					0;
 	
 			// If the nodes are siblings, we can do a quick check
@@ -1462,7 +1478,7 @@
 						elem.document && elem.document.nodeType !== 11 ) {
 					return ret;
 				}
-			} catch(e) {}
+			} catch (e) {}
 		}
 	
 		return Sizzle( expr, document, null, [ elem ] ).length > 0;
@@ -1681,7 +1697,7 @@
 				return pattern ||
 					(pattern = new RegExp( "(^|" + whitespace + ")" + className + "(" + whitespace + "|$)" )) &&
 					classCache( className, function( elem ) {
-						return pattern.test( typeof elem.className === "string" && elem.className || typeof elem.getAttribute !== strundefined && elem.getAttribute("class") || "" );
+						return pattern.test( typeof elem.className === "string" && elem.className || typeof elem.getAttribute !== "undefined" && elem.getAttribute("class") || "" );
 					});
 			},
 	
@@ -1703,7 +1719,7 @@
 						operator === "^=" ? check && result.indexOf( check ) === 0 :
 						operator === "*=" ? check && result.indexOf( check ) > -1 :
 						operator === "$=" ? check && result.slice( -check.length ) === check :
-						operator === "~=" ? ( " " + result + " " ).indexOf( check ) > -1 :
+						operator === "~=" ? ( " " + result.replace( rwhitespace, " " ) + " " ).indexOf( check ) > -1 :
 						operator === "|=" ? result === check || result.slice( 0, check.length + 1 ) === check + "-" :
 						false;
 				};
@@ -1823,7 +1839,7 @@
 								matched = fn( seed, argument ),
 								i = matched.length;
 							while ( i-- ) {
-								idx = indexOf.call( seed, matched[i] );
+								idx = indexOf( seed, matched[i] );
 								seed[ idx ] = !( matches[ idx ] = matched[i] );
 							}
 						}) :
@@ -1862,6 +1878,8 @@
 					function( elem, context, xml ) {
 						input[0] = elem;
 						matcher( input, null, xml, results );
+						// Don't keep the element (issue #299)
+						input[0] = null;
 						return !results.pop();
 					};
 			}),
@@ -1873,6 +1891,7 @@
 			}),
 	
 			"contains": markFunction(function( text ) {
+				text = text.replace( runescape, funescape );
 				return function( elem ) {
 					return ( elem.textContent || elem.innerText || getText( elem ) ).indexOf( text ) > -1;
 				};
@@ -2294,7 +2313,7 @@
 					i = matcherOut.length;
 					while ( i-- ) {
 						if ( (elem = matcherOut[i]) &&
-							(temp = postFinder ? indexOf.call( seed, elem ) : preMap[i]) > -1 ) {
+							(temp = postFinder ? indexOf( seed, elem ) : preMap[i]) > -1 ) {
 	
 							seed[temp] = !(results[temp] = elem);
 						}
@@ -2329,13 +2348,16 @@
 				return elem === checkContext;
 			}, implicitRelative, true ),
 			matchAnyContext = addCombinator( function( elem ) {
-				return indexOf.call( checkContext, elem ) > -1;
+				return indexOf( checkContext, elem ) > -1;
 			}, implicitRelative, true ),
 			matchers = [ function( elem, context, xml ) {
-				return ( !leadingRelative && ( xml || context !== outermostContext ) ) || (
+				var ret = ( !leadingRelative && ( xml || context !== outermostContext ) ) || (
 					(checkContext = context).nodeType ?
 						matchContext( elem, context, xml ) :
 						matchAnyContext( elem, context, xml ) );
+				// Avoid hanging onto element (issue #299)
+				checkContext = null;
+				return ret;
 			} ];
 	
 		for ( ; i < len; i++ ) {
@@ -2585,7 +2607,7 @@
 	// Sort stability
 	support.sortStable = expando.split("").sort( sortOrder ).join("") === expando;
 	
-	// Support: Chrome<14
+	// Support: Chrome 14-35+
 	// Always assume duplicates if they aren't passed to the comparison function
 	support.detectDuplicates = !!hasDuplicate;
 	
@@ -2794,7 +2816,7 @@
 					if ( match[1] ) {
 						context = context instanceof jQuery ? context[0] : context;
 	
-						// scripts is true for back-compat
+						// Option to run scripts is true for back-compat
 						// Intentionally let the error be thrown if parseHTML is not present
 						jQuery.merge( this, jQuery.parseHTML(
 							match[1],
@@ -2822,8 +2844,8 @@
 					} else {
 						elem = document.getElementById( match[2] );
 	
-						// Check parentNode to catch when Blackberry 4.6 returns
-						// nodes that are no longer in the document #6963
+						// Support: Blackberry 4.6
+						// gEBID returns nodes no longer in the document (#6963)
 						if ( elem && elem.parentNode ) {
 							// Inject the element directly into the jQuery object
 							this.length = 1;
@@ -2876,7 +2898,7 @@
 	
 	
 	var rparentsprev = /^(?:parents|prev(?:Until|All))/,
-		// methods guaranteed to produce a unique set when starting from a unique set
+		// Methods guaranteed to produce a unique set when starting from a unique set
 		guaranteedUnique = {
 			children: true,
 			contents: true,
@@ -2956,8 +2978,7 @@
 			return this.pushStack( matched.length > 1 ? jQuery.unique( matched ) : matched );
 		},
 	
-		// Determine the position of an element within
-		// the matched set of elements
+		// Determine the position of an element within the set
 		index: function( elem ) {
 	
 			// No argument, return index in parent
@@ -2965,7 +2986,7 @@
 				return ( this[ 0 ] && this[ 0 ].parentNode ) ? this.first().prevAll().length : -1;
 			}
 	
-			// index in selector
+			// Index in selector
 			if ( typeof elem === "string" ) {
 				return indexOf.call( jQuery( elem ), this[ 0 ] );
 			}
@@ -3381,7 +3402,7 @@
 	
 				progressValues, progressContexts, resolveContexts;
 	
-			// add listeners to Deferred subordinates; treat others as resolved
+			// Add listeners to Deferred subordinates; treat others as resolved
 			if ( length > 1 ) {
 				progressValues = new Array( length );
 				progressContexts = new Array( length );
@@ -3398,7 +3419,7 @@
 				}
 			}
 	
-			// if we're not waiting on anything, resolve the master
+			// If we're not waiting on anything, resolve the master
 			if ( !remaining ) {
 				deferred.resolveWith( resolveContexts, resolveValues );
 			}
@@ -3477,7 +3498,7 @@
 			readyList = jQuery.Deferred();
 	
 			// Catch cases where $(document).ready() is called after the browser event has already occurred.
-			// we once tried to use readyState "interactive" here, but it caused issues like the one
+			// We once tried to use readyState "interactive" here, but it caused issues like the one
 			// discovered by ChrisS here: http://bugs.jquery.com/ticket/12282#comment:15
 			if ( document.readyState === "complete" ) {
 				// Handle it asynchronously to allow scripts the opportunity to delay ready
@@ -3571,7 +3592,7 @@
 	
 	
 	function Data() {
-		// Support: Android < 4,
+		// Support: Android<4,
 		// Old WebKit does not have Object.preventExtensions/freeze method,
 		// return new empty object instead with no [[set]] accessor
 		Object.defineProperty( this.cache = {}, 0, {
@@ -3580,7 +3601,7 @@
 			}
 		});
 	
-		this.expando = jQuery.expando + Math.random();
+		this.expando = jQuery.expando + Data.uid++;
 	}
 	
 	Data.uid = 1;
@@ -3608,7 +3629,7 @@
 					descriptor[ this.expando ] = { value: unlock };
 					Object.defineProperties( owner, descriptor );
 	
-				// Support: Android < 4
+				// Support: Android<4
 				// Fallback to a less secure definition
 				} catch ( e ) {
 					descriptor[ this.expando ] = unlock;
@@ -3748,17 +3769,16 @@
 	
 	
 	
-	/*
-		Implementation Summary
+	//	Implementation Summary
+	//
+	//	1. Enforce API surface and semantic compatibility with 1.9.x branch
+	//	2. Improve the module's maintainability by reducing the storage
+	//		paths to a single mechanism.
+	//	3. Use the same single mechanism to support "private" and "user" data.
+	//	4. _Never_ expose "private" data to user code (TODO: Drop _data, _removeData)
+	//	5. Avoid exposing implementation details on user objects (eg. expando properties)
+	//	6. Provide a clear path for implementation upgrade to WeakMap in 2014
 	
-		1. Enforce API surface and semantic compatibility with 1.9.x branch
-		2. Improve the module's maintainability by reducing the storage
-			paths to a single mechanism.
-		3. Use the same single mechanism to support "private" and "user" data.
-		4. _Never_ expose "private" data to user code (TODO: Drop _data, _removeData)
-		5. Avoid exposing implementation details on user objects (eg. expando properties)
-		6. Provide a clear path for implementation upgrade to WeakMap in 2014
-	*/
 	var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
 		rmultiDash = /([A-Z])/g;
 	
@@ -3963,7 +3983,7 @@
 					queue.unshift( "inprogress" );
 				}
 	
-				// clear up the last queue stop function
+				// Clear up the last queue stop function
 				delete hooks.stop;
 				fn.call( elem, next, hooks );
 			}
@@ -3973,7 +3993,7 @@
 			}
 		},
 	
-		// not intended for public consumption - generates a queueHooks object, or returns the current one
+		// Not public - generate a queueHooks object, or return the current one
 		_queueHooks: function( elem, type ) {
 			var key = type + "queueHooks";
 			return data_priv.get( elem, key ) || data_priv.access( elem, key, {
@@ -4003,7 +4023,7 @@
 				this.each(function() {
 					var queue = jQuery.queue( this, type, data );
 	
-					// ensure a hooks for this queue
+					// Ensure a hooks for this queue
 					jQuery._queueHooks( this, type );
 	
 					if ( type === "fx" && queue[0] !== "inprogress" ) {
@@ -4070,21 +4090,22 @@
 			div = fragment.appendChild( document.createElement( "div" ) ),
 			input = document.createElement( "input" );
 	
-		// #11217 - WebKit loses check when the name is after the checked attribute
+		// Support: Safari<=5.1
+		// Check state lost if the name is set (#11217)
 		// Support: Windows Web Apps (WWA)
-		// `name` and `type` need .setAttribute for WWA
+		// `name` and `type` must use .setAttribute for WWA (#14901)
 		input.setAttribute( "type", "radio" );
 		input.setAttribute( "checked", "checked" );
 		input.setAttribute( "name", "t" );
 	
 		div.appendChild( input );
 	
-		// Support: Safari 5.1, iOS 5.1, Android 4.x, Android 2.3
-		// old WebKit doesn't clone checked state correctly in fragments
+		// Support: Safari<=5.1, Android<4.2
+		// Older WebKit doesn't clone checked state correctly in fragments
 		support.checkClone = div.cloneNode( true ).cloneNode( true ).lastChild.checked;
 	
+		// Support: IE<=11+
 		// Make sure textarea (and checkbox) defaultValue is properly cloned
-		// Support: IE9-IE11+
 		div.innerHTML = "<textarea>x</textarea>";
 		support.noCloneChecked = !!div.cloneNode( true ).lastChild.defaultValue;
 	})();
@@ -4462,8 +4483,8 @@
 				j = 0;
 				while ( (handleObj = matched.handlers[ j++ ]) && !event.isImmediatePropagationStopped() ) {
 	
-					// Triggered event must either 1) have no namespace, or
-					// 2) have namespace(s) a subset or equal to those in the bound event (both can have no namespace).
+					// Triggered event must either 1) have no namespace, or 2) have namespace(s)
+					// a subset or equal to those in the bound event (both can have no namespace).
 					if ( !event.namespace_re || event.namespace_re.test( handleObj.namespace ) ) {
 	
 						event.handleObj = handleObj;
@@ -4613,7 +4634,7 @@
 				event.target = document;
 			}
 	
-			// Support: Safari 6.0+, Chrome < 28
+			// Support: Safari 6.0+, Chrome<28
 			// Target should not be a text node (#504, #13143)
 			if ( event.target.nodeType === 3 ) {
 				event.target = event.target.parentNode;
@@ -4718,7 +4739,7 @@
 			// by a handler lower down the tree; reflect the correct value.
 			this.isDefaultPrevented = src.defaultPrevented ||
 					src.defaultPrevented === undefined &&
-					// Support: Android < 4.0
+					// Support: Android<4.0
 					src.returnValue === false ?
 				returnTrue :
 				returnFalse;
@@ -4808,8 +4829,8 @@
 		};
 	});
 	
-	// Create "bubbling" focus and blur events
 	// Support: Firefox, Chrome, Safari
+	// Create "bubbling" focus and blur events
 	if ( !support.focusinBubbles ) {
 		jQuery.each({ focus: "focusin", blur: "focusout" }, function( orig, fix ) {
 	
@@ -4962,7 +4983,7 @@
 		// We have to close these tags to support XHTML (#13200)
 		wrapMap = {
 	
-			// Support: IE 9
+			// Support: IE9
 			option: [ 1, "<select multiple='multiple'>", "</select>" ],
 	
 			thead: [ 1, "<table>", "</table>" ],
@@ -4973,7 +4994,7 @@
 			_default: [ 0, "", "" ]
 		};
 	
-	// Support: IE 9
+	// Support: IE9
 	wrapMap.optgroup = wrapMap.option;
 	
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
@@ -5063,7 +5084,7 @@
 			ret;
 	}
 	
-	// Support: IE >= 9
+	// Fix IE bugs, see support tests
 	function fixInput( src, dest ) {
 		var nodeName = dest.nodeName.toLowerCase();
 	
@@ -5083,8 +5104,7 @@
 				clone = elem.cloneNode( true ),
 				inPage = jQuery.contains( elem.ownerDocument, elem );
 	
-			// Support: IE >= 9
-			// Fix Cloning issues
+			// Fix IE cloning issues
 			if ( !support.noCloneChecked && ( elem.nodeType === 1 || elem.nodeType === 11 ) &&
 					!jQuery.isXMLDoc( elem ) ) {
 	
@@ -5135,8 +5155,8 @@
 	
 					// Add nodes directly
 					if ( jQuery.type( elem ) === "object" ) {
-						// Support: QtWebKit
-						// jQuery.merge because push.apply(_, arraylike) throws
+						// Support: QtWebKit, PhantomJS
+						// push.apply(_, arraylike) throws on ancient WebKit
 						jQuery.merge( nodes, elem.nodeType ? [ elem ] : elem );
 	
 					// Convert non-html into a text node
@@ -5158,15 +5178,14 @@
 							tmp = tmp.lastChild;
 						}
 	
-						// Support: QtWebKit
-						// jQuery.merge because push.apply(_, arraylike) throws
+						// Support: QtWebKit, PhantomJS
+						// push.apply(_, arraylike) throws on ancient WebKit
 						jQuery.merge( nodes, tmp.childNodes );
 	
 						// Remember the top-level container
 						tmp = fragment.firstChild;
 	
-						// Fixes #12346
-						// Support: Webkit, IE
+						// Ensure the created nodes are orphaned (#12392)
 						tmp.textContent = "";
 					}
 				}
@@ -5528,7 +5547,7 @@
 			// getDefaultComputedStyle might be reliably used only on attached element
 			display = window.getDefaultComputedStyle && ( style = window.getDefaultComputedStyle( elem[ 0 ] ) ) ?
 	
-				// Use of this method is a temporary fix (more like optmization) until something better comes along,
+				// Use of this method is a temporary fix (more like optimization) until something better comes along,
 				// since it was removed from specification and supported only in FF
 				style.display : jQuery.css( elem[ 0 ], "display" );
 	
@@ -5578,7 +5597,14 @@
 	var rnumnonpx = new RegExp( "^(" + pnum + ")(?!px)[a-z%]+$", "i" );
 	
 	var getStyles = function( elem ) {
-			return elem.ownerDocument.defaultView.getComputedStyle( elem, null );
+			// Support: IE<=11+, Firefox<=30+ (#15098, #14150)
+			// IE throws on elements created in popups
+			// FF meanwhile throws on frame elements through "defaultView.getComputedStyle"
+			if ( elem.ownerDocument.defaultView.opener ) {
+				return elem.ownerDocument.defaultView.getComputedStyle( elem, null );
+			}
+	
+			return window.getComputedStyle( elem, null );
 		};
 	
 	
@@ -5590,7 +5616,7 @@
 		computed = computed || getStyles( elem );
 	
 		// Support: IE9
-		// getPropertyValue is only needed for .css('filter') in IE9, see #12537
+		// getPropertyValue is only needed for .css('filter') (#12537)
 		if ( computed ) {
 			ret = computed.getPropertyValue( name ) || computed[ name ];
 		}
@@ -5636,15 +5662,13 @@
 		return {
 			get: function() {
 				if ( conditionFn() ) {
-					// Hook not needed (or it's not possible to use it due to missing dependency),
-					// remove it.
-					// Since there are no other hooks for marginRight, remove the whole object.
+					// Hook not needed (or it's not possible to use it due
+					// to missing dependency), remove it.
 					delete this.get;
 					return;
 				}
 	
 				// Hook needed; redefine it so that the support test is not executed again.
-	
 				return (this.get = hookFn).apply( this, arguments );
 			}
 		};
@@ -5661,6 +5685,8 @@
 			return;
 		}
 	
+		// Support: IE9-11+
+		// Style of cloned element affects source element cloned (#8908)
 		div.style.backgroundClip = "content-box";
 		div.cloneNode( true ).style.backgroundClip = "";
 		support.clearCloneStyle = div.style.backgroundClip === "content-box";
@@ -5693,6 +5719,7 @@
 		if ( window.getComputedStyle ) {
 			jQuery.extend( support, {
 				pixelPosition: function() {
+	
 					// This test is executed only once but we still do memoizing
 					// since we can use the boxSizingReliable pre-computing.
 					// No need to check if the test was already performed, though.
@@ -5706,6 +5733,7 @@
 					return boxSizingReliableVal;
 				},
 				reliableMarginRight: function() {
+	
 					// Support: Android 2.3
 					// Check if div with explicit width and no margin-right incorrectly
 					// gets computed margin-right based on width of container. (#3333)
@@ -5727,6 +5755,7 @@
 					ret = !parseFloat( window.getComputedStyle( marginDiv, null ).marginRight );
 	
 					docElem.removeChild( container );
+					div.removeChild( marginDiv );
 	
 					return ret;
 				}
@@ -5758,8 +5787,8 @@
 	
 	
 	var
-		// swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
-		// see here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
+		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
 		rdisplayswap = /^(none|table(?!-c[ea]).+)/,
 		rnumsplit = new RegExp( "^(" + pnum + ")(.*)$", "i" ),
 		rrelNum = new RegExp( "^([+-])=(" + pnum + ")", "i" ),
@@ -5772,15 +5801,15 @@
 	
 		cssPrefixes = [ "Webkit", "O", "Moz", "ms" ];
 	
-	// return a css property mapped to a potentially vendor prefixed property
+	// Return a css property mapped to a potentially vendor prefixed property
 	function vendorPropName( style, name ) {
 	
-		// shortcut for names that are not vendor prefixed
+		// Shortcut for names that are not vendor prefixed
 		if ( name in style ) {
 			return name;
 		}
 	
-		// check for vendor prefixed names
+		// Check for vendor prefixed names
 		var capName = name[0].toUpperCase() + name.slice(1),
 			origName = name,
 			i = cssPrefixes.length;
@@ -5813,7 +5842,7 @@
 			val = 0;
 	
 		for ( ; i < 4; i += 2 ) {
-			// both box models exclude margin, so add it if we want it
+			// Both box models exclude margin, so add it if we want it
 			if ( extra === "margin" ) {
 				val += jQuery.css( elem, extra + cssExpand[ i ], true, styles );
 			}
@@ -5824,15 +5853,15 @@
 					val -= jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
 				}
 	
-				// at this point, extra isn't border nor margin, so remove border
+				// At this point, extra isn't border nor margin, so remove border
 				if ( extra !== "margin" ) {
 					val -= jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 				}
 			} else {
-				// at this point, extra isn't content, so add padding
+				// At this point, extra isn't content, so add padding
 				val += jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
 	
-				// at this point, extra isn't content nor padding, so add border
+				// At this point, extra isn't content nor padding, so add border
 				if ( extra !== "padding" ) {
 					val += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 				}
@@ -5850,7 +5879,7 @@
 			styles = getStyles( elem ),
 			isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
 	
-		// some non-html elements return undefined for offsetWidth, so check for null/undefined
+		// Some non-html elements return undefined for offsetWidth, so check for null/undefined
 		// svg - https://bugzilla.mozilla.org/show_bug.cgi?id=649285
 		// MathML - https://bugzilla.mozilla.org/show_bug.cgi?id=491668
 		if ( val <= 0 || val == null ) {
@@ -5865,7 +5894,7 @@
 				return val;
 			}
 	
-			// we need the check for style in case a browser which returns unreliable values
+			// Check for style in case a browser which returns unreliable values
 			// for getComputedStyle silently falls back to the reliable elem.style
 			valueIsBorderBox = isBorderBox &&
 				( support.boxSizingReliable() || val === elem.style[ name ] );
@@ -5874,7 +5903,7 @@
 			val = parseFloat( val ) || 0;
 		}
 	
-		// use the active box-sizing model to add/subtract irrelevant styles
+		// Use the active box-sizing model to add/subtract irrelevant styles
 		return ( val +
 			augmentWidthOrHeight(
 				elem,
@@ -5938,12 +5967,14 @@
 	}
 	
 	jQuery.extend({
+	
 		// Add in style property hooks for overriding the default
 		// behavior of getting and setting a style property
 		cssHooks: {
 			opacity: {
 				get: function( elem, computed ) {
 					if ( computed ) {
+	
 						// We should always get a number back from opacity
 						var ret = curCSS( elem, "opacity" );
 						return ret === "" ? "1" : ret;
@@ -5971,12 +6002,12 @@
 		// Add in properties whose names you wish to fix before
 		// setting or getting the value
 		cssProps: {
-			// normalize float css property
 			"float": "cssFloat"
 		},
 	
 		// Get and set the style property on a DOM Node
 		style: function( elem, name, value, extra ) {
+	
 			// Don't set styles on text and comment nodes
 			if ( !elem || elem.nodeType === 3 || elem.nodeType === 8 || !elem.style ) {
 				return;
@@ -5989,33 +6020,32 @@
 	
 			name = jQuery.cssProps[ origName ] || ( jQuery.cssProps[ origName ] = vendorPropName( style, origName ) );
 	
-			// gets hook for the prefixed version
-			// followed by the unprefixed version
+			// Gets hook for the prefixed version, then unprefixed version
 			hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
 	
 			// Check if we're setting a value
 			if ( value !== undefined ) {
 				type = typeof value;
 	
-				// convert relative number strings (+= or -=) to relative numbers. #7345
+				// Convert "+=" or "-=" to relative numbers (#7345)
 				if ( type === "string" && (ret = rrelNum.exec( value )) ) {
 					value = ( ret[1] + 1 ) * ret[2] + parseFloat( jQuery.css( elem, name ) );
 					// Fixes bug #9237
 					type = "number";
 				}
 	
-				// Make sure that null and NaN values aren't set. See: #7116
+				// Make sure that null and NaN values aren't set (#7116)
 				if ( value == null || value !== value ) {
 					return;
 				}
 	
-				// If a number was passed in, add 'px' to the (except for certain CSS properties)
+				// If a number, add 'px' to the (except for certain CSS properties)
 				if ( type === "number" && !jQuery.cssNumber[ origName ] ) {
 					value += "px";
 				}
 	
-				// Fixes #8908, it can be done more correctly by specifying setters in cssHooks,
-				// but it would mean to define eight (for every problematic property) identical functions
+				// Support: IE9-11+
+				// background-* props affect original clone's values
 				if ( !support.clearCloneStyle && value === "" && name.indexOf( "background" ) === 0 ) {
 					style[ name ] = "inherit";
 				}
@@ -6043,8 +6073,7 @@
 			// Make sure that we're working with the right name
 			name = jQuery.cssProps[ origName ] || ( jQuery.cssProps[ origName ] = vendorPropName( elem.style, origName ) );
 	
-			// gets hook for the prefixed version
-			// followed by the unprefixed version
+			// Try prefixed name followed by the unprefixed name
 			hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
 	
 			// If a hook was provided get the computed value from there
@@ -6057,12 +6086,12 @@
 				val = curCSS( elem, name, styles );
 			}
 	
-			//convert "normal" to computed value
+			// Convert "normal" to computed value
 			if ( val === "normal" && name in cssNormalTransform ) {
 				val = cssNormalTransform[ name ];
 			}
 	
-			// Return, converting to number if forced or a qualifier was provided and val looks numeric
+			// Make numeric if forced or a qualifier was provided and val looks numeric
 			if ( extra === "" || extra ) {
 				num = parseFloat( val );
 				return extra === true || jQuery.isNumeric( num ) ? num || 0 : val;
@@ -6075,8 +6104,9 @@
 		jQuery.cssHooks[ name ] = {
 			get: function( elem, computed, extra ) {
 				if ( computed ) {
-					// certain elements can have dimension info if we invisibly show them
-					// however, it must have a current display style that would benefit from this
+	
+					// Certain elements can have dimension info if we invisibly show them
+					// but it must have a current display style that would benefit
 					return rdisplayswap.test( jQuery.css( elem, "display" ) ) && elem.offsetWidth === 0 ?
 						jQuery.swap( elem, cssShow, function() {
 							return getWidthOrHeight( elem, name, extra );
@@ -6104,8 +6134,6 @@
 	jQuery.cssHooks.marginRight = addGetHookIf( support.reliableMarginRight,
 		function( elem, computed ) {
 			if ( computed ) {
-				// WebKit Bug 13343 - getComputedStyle returns wrong value for margin-right
-				// Work around by temporarily setting element display to inline-block
 				return jQuery.swap( elem, { "display": "inline-block" },
 					curCSS, [ elem, "marginRight" ] );
 			}
@@ -6123,7 +6151,7 @@
 				var i = 0,
 					expanded = {},
 	
-					// assumes a single number if not a string
+					// Assumes a single number if not a string
 					parts = typeof value === "string" ? value.split(" ") : [ value ];
 	
 				for ( ; i < 4; i++ ) {
@@ -6246,17 +6274,18 @@
 					return tween.elem[ tween.prop ];
 				}
 	
-				// passing an empty string as a 3rd parameter to .css will automatically
-				// attempt a parseFloat and fallback to a string if the parse fails
-				// so, simple values such as "10px" are parsed to Float.
-				// complex values such as "rotate(1rad)" are returned as is.
+				// Passing an empty string as a 3rd parameter to .css will automatically
+				// attempt a parseFloat and fallback to a string if the parse fails.
+				// Simple values such as "10px" are parsed to Float;
+				// complex values such as "rotate(1rad)" are returned as-is.
 				result = jQuery.css( tween.elem, tween.prop, "" );
 				// Empty strings, null, undefined and "auto" are converted to 0.
 				return !result || result === "auto" ? 0 : result;
 			},
 			set: function( tween ) {
-				// use step hook for back compat - use cssHook if its there - use .style if its
-				// available and use plain properties where available
+				// Use step hook for back compat.
+				// Use cssHook if its there.
+				// Use .style if available and use plain properties where available.
 				if ( jQuery.fx.step[ tween.prop ] ) {
 					jQuery.fx.step[ tween.prop ]( tween );
 				} else if ( tween.elem.style && ( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null || jQuery.cssHooks[ tween.prop ] ) ) {
@@ -6270,7 +6299,6 @@
 	
 	// Support: IE9
 	// Panic based approach to setting things on disconnected nodes
-	
 	Tween.propHooks.scrollTop = Tween.propHooks.scrollLeft = {
 		set: function( tween ) {
 			if ( tween.elem.nodeType && tween.elem.parentNode ) {
@@ -6326,16 +6354,16 @@
 					start = +target || 1;
 	
 					do {
-						// If previous iteration zeroed out, double until we get *something*
-						// Use a string for doubling factor so we don't accidentally see scale as unchanged below
+						// If previous iteration zeroed out, double until we get *something*.
+						// Use string for doubling so we don't accidentally see scale as unchanged below
 						scale = scale || ".5";
 	
 						// Adjust and apply
 						start = start / scale;
 						jQuery.style( tween.elem, prop, start + unit );
 	
-					// Update scale, tolerating zero or NaN from tween.cur()
-					// And breaking the loop if scale is unchanged or perfect, or if we've just had enough
+					// Update scale, tolerating zero or NaN from tween.cur(),
+					// break the loop if scale is unchanged or perfect, or if we've just had enough
 					} while ( scale !== (scale = tween.cur() / target) && scale !== 1 && --maxIterations );
 				}
 	
@@ -6367,8 +6395,8 @@
 			i = 0,
 			attrs = { height: type };
 	
-		// if we include width, step value is 1 to do all cssExpand values,
-		// if we don't include width, step value is 2 to skip over Left and Right
+		// If we include width, step value is 1 to do all cssExpand values,
+		// otherwise step value is 2 to skip over Left and Right
 		includeWidth = includeWidth ? 1 : 0;
 		for ( ; i < 4 ; i += 2 - includeWidth ) {
 			which = cssExpand[ i ];
@@ -6390,7 +6418,7 @@
 		for ( ; index < length; index++ ) {
 			if ( (tween = collection[ index ].call( animation, prop, value )) ) {
 	
-				// we're done with this property
+				// We're done with this property
 				return tween;
 			}
 		}
@@ -6405,7 +6433,7 @@
 			hidden = elem.nodeType && isHidden( elem ),
 			dataShow = data_priv.get( elem, "fxshow" );
 	
-		// handle queue: false promises
+		// Handle queue: false promises
 		if ( !opts.queue ) {
 			hooks = jQuery._queueHooks( elem, "fx" );
 			if ( hooks.unqueued == null ) {
@@ -6420,8 +6448,7 @@
 			hooks.unqueued++;
 	
 			anim.always(function() {
-				// doing this makes sure that the complete handler will be called
-				// before this completes
+				// Ensure the complete handler is called before this completes
 				anim.always(function() {
 					hooks.unqueued--;
 					if ( !jQuery.queue( elem, "fx" ).length ) {
@@ -6431,7 +6458,7 @@
 			});
 		}
 	
-		// height/width overflow pass
+		// Height/width overflow pass
 		if ( elem.nodeType === 1 && ( "height" in props || "width" in props ) ) {
 			// Make sure that nothing sneaks out
 			// Record all 3 overflow attributes because IE9-10 do not
@@ -6493,7 +6520,7 @@
 				dataShow = data_priv.access( elem, "fxshow", {} );
 			}
 	
-			// store state if its toggle - enables .stop().toggle() to "reverse"
+			// Store state if its toggle - enables .stop().toggle() to "reverse"
 			if ( toggle ) {
 				dataShow.hidden = !hidden;
 			}
@@ -6553,8 +6580,8 @@
 				value = hooks.expand( value );
 				delete props[ name ];
 	
-				// not quite $.extend, this wont overwrite keys already present.
-				// also - reusing 'index' from above because we have the correct "name"
+				// Not quite $.extend, this won't overwrite existing keys.
+				// Reusing 'index' because we have the correct "name"
 				for ( index in value ) {
 					if ( !( index in props ) ) {
 						props[ index ] = value[ index ];
@@ -6573,7 +6600,7 @@
 			index = 0,
 			length = animationPrefilters.length,
 			deferred = jQuery.Deferred().always( function() {
-				// don't match elem in the :animated selector
+				// Don't match elem in the :animated selector
 				delete tick.elem;
 			}),
 			tick = function() {
@@ -6582,7 +6609,8 @@
 				}
 				var currentTime = fxNow || createFxNow(),
 					remaining = Math.max( 0, animation.startTime + animation.duration - currentTime ),
-					// archaic crash bug won't allow us to use 1 - ( 0.5 || 0 ) (#12497)
+					// Support: Android 2.3
+					// Archaic crash bug won't allow us to use `1 - ( 0.5 || 0 )` (#12497)
 					temp = remaining / animation.duration || 0,
 					percent = 1 - temp,
 					index = 0,
@@ -6618,7 +6646,7 @@
 				},
 				stop: function( gotoEnd ) {
 					var index = 0,
-						// if we are going to the end, we want to run all the tweens
+						// If we are going to the end, we want to run all the tweens
 						// otherwise we skip this part
 						length = gotoEnd ? animation.tweens.length : 0;
 					if ( stopped ) {
@@ -6629,8 +6657,7 @@
 						animation.tweens[ index ].run( 1 );
 					}
 	
-					// resolve when we played the last frame
-					// otherwise, reject
+					// Resolve when we played the last frame; otherwise, reject
 					if ( gotoEnd ) {
 						deferred.resolveWith( elem, [ animation, gotoEnd ] );
 					} else {
@@ -6712,7 +6739,7 @@
 		opt.duration = jQuery.fx.off ? 0 : typeof opt.duration === "number" ? opt.duration :
 			opt.duration in jQuery.fx.speeds ? jQuery.fx.speeds[ opt.duration ] : jQuery.fx.speeds._default;
 	
-		// normalize opt.queue - true/undefined/null -> "fx"
+		// Normalize opt.queue - true/undefined/null -> "fx"
 		if ( opt.queue == null || opt.queue === true ) {
 			opt.queue = "fx";
 		}
@@ -6736,10 +6763,10 @@
 	jQuery.fn.extend({
 		fadeTo: function( speed, to, easing, callback ) {
 	
-			// show any hidden elements after setting opacity to 0
+			// Show any hidden elements after setting opacity to 0
 			return this.filter( isHidden ).css( "opacity", 0 ).show()
 	
-				// animate to the value specified
+				// Animate to the value specified
 				.end().animate({ opacity: to }, speed, easing, callback );
 		},
 		animate: function( prop, speed, easing, callback ) {
@@ -6802,9 +6829,9 @@
 					}
 				}
 	
-				// start the next in the queue if the last step wasn't forced
-				// timers currently will call their complete callbacks, which will dequeue
-				// but only if they were gotoEnd
+				// Start the next in the queue if the last step wasn't forced.
+				// Timers currently will call their complete callbacks, which
+				// will dequeue but only if they were gotoEnd.
 				if ( dequeue || !gotoEnd ) {
 					jQuery.dequeue( this, type );
 				}
@@ -6822,17 +6849,17 @@
 					timers = jQuery.timers,
 					length = queue ? queue.length : 0;
 	
-				// enable finishing flag on private data
+				// Enable finishing flag on private data
 				data.finish = true;
 	
-				// empty the queue first
+				// Empty the queue first
 				jQuery.queue( this, type, [] );
 	
 				if ( hooks && hooks.stop ) {
 					hooks.stop.call( this, true );
 				}
 	
-				// look for any active animations, and finish them
+				// Look for any active animations, and finish them
 				for ( index = timers.length; index--; ) {
 					if ( timers[ index ].elem === this && timers[ index ].queue === type ) {
 						timers[ index ].anim.stop( true );
@@ -6840,14 +6867,14 @@
 					}
 				}
 	
-				// look for any animations in the old queue and finish them
+				// Look for any animations in the old queue and finish them
 				for ( index = 0; index < length; index++ ) {
 					if ( queue[ index ] && queue[ index ].finish ) {
 						queue[ index ].finish.call( this );
 					}
 				}
 	
-				// turn off finishing flag
+				// Turn off finishing flag
 				delete data.finish;
 			});
 		}
@@ -6950,21 +6977,21 @@
 	
 		input.type = "checkbox";
 	
-		// Support: iOS 5.1, Android 4.x, Android 2.3
-		// Check the default checkbox/radio value ("" on old WebKit; "on" elsewhere)
+		// Support: iOS<=5.1, Android<=4.2+
+		// Default value for a checkbox should be "on"
 		support.checkOn = input.value !== "";
 	
-		// Must access the parent to make an option select properly
-		// Support: IE9, IE10
+		// Support: IE<=11+
+		// Must access selectedIndex to make default options select
 		support.optSelected = opt.selected;
 	
-		// Make sure that the options inside disabled selects aren't marked as disabled
-		// (WebKit marks them as disabled)
+		// Support: Android<=2.3
+		// Options inside disabled selects are incorrectly marked as disabled
 		select.disabled = true;
 		support.optDisabled = !opt.disabled;
 	
-		// Check if an input maintains its value after becoming a radio
-		// Support: IE9, IE10
+		// Support: IE<=11+
+		// An input loses its value after becoming a radio
 		input = document.createElement( "input" );
 		input.value = "t";
 		input.type = "radio";
@@ -7061,8 +7088,6 @@
 				set: function( elem, value ) {
 					if ( !support.radioValue && value === "radio" &&
 						jQuery.nodeName( elem, "input" ) ) {
-						// Setting the type on a radio button after the value resets the value in IE6-9
-						// Reset value to default in case type is set after value during creation
 						var val = elem.value;
 						elem.setAttribute( "type", value );
 						if ( val ) {
@@ -7132,7 +7157,7 @@
 			var ret, hooks, notxml,
 				nType = elem.nodeType;
 	
-			// don't get/set properties on text, comment and attribute nodes
+			// Don't get/set properties on text, comment and attribute nodes
 			if ( !elem || nType === 3 || nType === 8 || nType === 2 ) {
 				return;
 			}
@@ -7168,8 +7193,6 @@
 		}
 	});
 	
-	// Support: IE9+
-	// Selectedness for an option in an optgroup can be inaccurate
 	if ( !support.optSelected ) {
 		jQuery.propHooks.selected = {
 			get: function( elem ) {
@@ -7277,7 +7300,7 @@
 							}
 						}
 	
-						// only assign if different to avoid unneeded rendering.
+						// Only assign if different to avoid unneeded rendering.
 						finalValue = value ? jQuery.trim( cur ) : "";
 						if ( elem.className !== finalValue ) {
 							elem.className = finalValue;
@@ -7304,14 +7327,14 @@
 	
 			return this.each(function() {
 				if ( type === "string" ) {
-					// toggle individual class names
+					// Toggle individual class names
 					var className,
 						i = 0,
 						self = jQuery( this ),
 						classNames = value.match( rnotwhite ) || [];
 	
 					while ( (className = classNames[ i++ ]) ) {
-						// check each className given, space separated list
+						// Check each className given, space separated list
 						if ( self.hasClass( className ) ) {
 							self.removeClass( className );
 						} else {
@@ -7326,7 +7349,7 @@
 						data_priv.set( this, "__className__", this.className );
 					}
 	
-					// If the element has a class name or if we're passed "false",
+					// If the element has a class name or if we're passed `false`,
 					// then remove the whole classname (if there was one, the above saved it).
 					// Otherwise bring back whatever was previously saved (if anything),
 					// falling back to the empty string if nothing was stored.
@@ -7370,9 +7393,9 @@
 					ret = elem.value;
 	
 					return typeof ret === "string" ?
-						// handle most common string cases
+						// Handle most common string cases
 						ret.replace(rreturn, "") :
-						// handle cases where value is null/undef or number
+						// Handle cases where value is null/undef or number
 						ret == null ? "" : ret;
 				}
 	
@@ -7480,7 +7503,7 @@
 						}
 					}
 	
-					// force browsers to behave consistently when non-matching value is set
+					// Force browsers to behave consistently when non-matching value is set
 					if ( !optionSet ) {
 						elem.selectedIndex = -1;
 					}
@@ -7501,8 +7524,6 @@
 		};
 		if ( !support.checkOn ) {
 			jQuery.valHooks[ this ].get = function( elem ) {
-				// Support: Webkit
-				// "" is returned instead of "on" if a value isn't specified
 				return elem.getAttribute("value") === null ? "on" : elem.value;
 			};
 		}
@@ -7584,10 +7605,6 @@
 	
 	
 	var
-		// Document location
-		ajaxLocParts,
-		ajaxLocation,
-	
 		rhash = /#.*$/,
 		rts = /([?&])_=[^&]*/,
 		rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg,
@@ -7616,22 +7633,13 @@
 		transports = {},
 	
 		// Avoid comment-prolog char sequence (#10098); must appease lint and evade compression
-		allTypes = "*/".concat("*");
+		allTypes = "*/".concat( "*" ),
 	
-	// #8138, IE may throw an exception when accessing
-	// a field from window.location if document.domain has been set
-	try {
-		ajaxLocation = location.href;
-	} catch( e ) {
-		// Use the href attribute of an A element
-		// since IE will modify it given document.location
-		ajaxLocation = document.createElement( "a" );
-		ajaxLocation.href = "";
-		ajaxLocation = ajaxLocation.href;
-	}
+		// Document location
+		ajaxLocation = window.location.href,
 	
-	// Segment location into parts
-	ajaxLocParts = rurl.exec( ajaxLocation.toLowerCase() ) || [];
+		// Segment location into parts
+		ajaxLocParts = rurl.exec( ajaxLocation.toLowerCase() ) || [];
 	
 	// Base "constructor" for jQuery.ajaxPrefilter and jQuery.ajaxTransport
 	function addToPrefiltersOrTransports( structure ) {
@@ -8110,7 +8118,8 @@
 			}
 	
 			// We can fire global events as of now if asked to
-			fireGlobals = s.global;
+			// Don't fire events if jQuery.event is undefined in an AMD-usage scenario (#15118)
+			fireGlobals = jQuery.event && s.global;
 	
 			// Watch for a new set of requests
 			if ( fireGlobals && jQuery.active++ === 0 ) {
@@ -8183,7 +8192,7 @@
 				return jqXHR.abort();
 			}
 	
-			// aborting is no longer a cancellation
+			// Aborting is no longer a cancellation
 			strAbort = "abort";
 	
 			// Install callbacks on deferreds
@@ -8295,8 +8304,7 @@
 						isSuccess = !error;
 					}
 				} else {
-					// We extract error from statusText
-					// then normalize statusText and status for non-aborts
+					// Extract error from statusText and normalize for non-aborts
 					error = statusText;
 					if ( status || !statusText ) {
 						statusText = "error";
@@ -8352,7 +8360,7 @@
 	
 	jQuery.each( [ "get", "post" ], function( i, method ) {
 		jQuery[ method ] = function( url, data, callback, type ) {
-			// shift arguments if data argument was omitted
+			// Shift arguments if data argument was omitted
 			if ( jQuery.isFunction( data ) ) {
 				type = type || callback;
 				callback = data;
@@ -8366,13 +8374,6 @@
 				data: data,
 				success: callback
 			});
-		};
-	});
-	
-	// Attach a bunch of functions for handling common AJAX events
-	jQuery.each( [ "ajaxStart", "ajaxStop", "ajaxComplete", "ajaxError", "ajaxSuccess", "ajaxSend" ], function( i, type ) {
-		jQuery.fn[ type ] = function( fn ) {
-			return this.on( type, fn );
 		};
 	});
 	
@@ -8593,8 +8594,9 @@
 	
 	// Support: IE9
 	// Open requests must be manually aborted on unload (#5280)
-	if ( window.ActiveXObject ) {
-		jQuery( window ).on( "unload", function() {
+	// See https://support.microsoft.com/kb/2856746 for more info
+	if ( window.attachEvent ) {
+		window.attachEvent( "onunload", function() {
 			for ( var key in xhrCallbacks ) {
 				xhrCallbacks[ key ]();
 			}
@@ -8947,6 +8949,16 @@
 	
 	
 	
+	// Attach a bunch of functions for handling common AJAX events
+	jQuery.each( [ "ajaxStart", "ajaxStop", "ajaxComplete", "ajaxError", "ajaxSuccess", "ajaxSend" ], function( i, type ) {
+		jQuery.fn[ type ] = function( fn ) {
+			return this.on( type, fn );
+		};
+	});
+	
+	
+	
+	
 	jQuery.expr.filters.animated = function( elem ) {
 		return jQuery.grep(jQuery.timers, function( fn ) {
 			return elem === fn.elem;
@@ -8983,7 +8995,8 @@
 			calculatePosition = ( position === "absolute" || position === "fixed" ) &&
 				( curCSSTop + curCSSLeft ).indexOf("auto") > -1;
 	
-			// Need to be able to calculate position if either top or left is auto and position is either absolute or fixed
+			// Need to be able to calculate position if either
+			// top or left is auto and position is either absolute or fixed
 			if ( calculatePosition ) {
 				curPosition = curElem.position();
 				curTop = curPosition.top;
@@ -9040,8 +9053,8 @@
 				return box;
 			}
 	
+			// Support: BlackBerry 5, iOS 3 (original iPhone)
 			// If we don't have gBCR, just use 0,0 rather than error
-			// BlackBerry 5, iOS 3 (original iPhone)
 			if ( typeof elem.getBoundingClientRect !== strundefined ) {
 				box = elem.getBoundingClientRect();
 			}
@@ -9063,7 +9076,7 @@
 	
 			// Fixed elements are offset from window (parentOffset = {top:0, left: 0}, because it is its only offset parent
 			if ( jQuery.css( elem, "position" ) === "fixed" ) {
-				// We assume that getBoundingClientRect is available when computed position is fixed
+				// Assume getBoundingClientRect is there when computed position is fixed
 				offset = elem.getBoundingClientRect();
 	
 			} else {
@@ -9126,16 +9139,18 @@
 		};
 	});
 	
+	// Support: Safari<7+, Chrome<37+
 	// Add the top/left cssHooks using jQuery.fn.position
 	// Webkit bug: https://bugs.webkit.org/show_bug.cgi?id=29084
-	// getComputedStyle returns percent when specified for top/left/bottom/right
-	// rather than make the css module depend on the offset module, we just check for it here
+	// Blink bug: https://code.google.com/p/chromium/issues/detail?id=229280
+	// getComputedStyle returns percent when specified for top/left/bottom/right;
+	// rather than make the css module depend on the offset module, just check for it here
 	jQuery.each( [ "top", "left" ], function( i, prop ) {
 		jQuery.cssHooks[ prop ] = addGetHookIf( support.pixelPosition,
 			function( elem, computed ) {
 				if ( computed ) {
 					computed = curCSS( elem, prop );
-					// if curCSS returns percentage, fallback to offset
+					// If curCSS returns percentage, fallback to offset
 					return rnumnonpx.test( computed ) ?
 						jQuery( elem ).position()[ prop ] + "px" :
 						computed;
@@ -9148,7 +9163,7 @@
 	// Create innerHeight, innerWidth, height, width, outerHeight and outerWidth methods
 	jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 		jQuery.each( { padding: "inner" + name, content: type, "": "outer" + name }, function( defaultExtra, funcName ) {
-			// margin is only for outerHeight, outerWidth
+			// Margin is only for outerHeight, outerWidth
 			jQuery.fn[ funcName ] = function( margin, value ) {
 				var chainable = arguments.length && ( defaultExtra || typeof margin !== "boolean" ),
 					extra = defaultExtra || ( margin === true || value === true ? "margin" : "border" );
@@ -9239,8 +9254,8 @@
 		return jQuery;
 	};
 	
-	// Expose jQuery and $ identifiers, even in
-	// AMD (#7102#comment:10, https://github.com/jquery/jquery/pull/557)
+	// Expose jQuery and $ identifiers, even in AMD
+	// (#7102#comment:10, https://github.com/jquery/jquery/pull/557)
 	// and CommonJS for browser emulators (#13566)
 	if ( typeof noGlobal === strundefined ) {
 		window.jQuery = window.$ = jQuery;
@@ -15869,7 +15884,7 @@
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// MarionetteJS (Backbone.Marionette)
 	// ----------------------------------
-	// v2.2.0
+	// v2.3.0
 	//
 	// Copyright (c)2014 Derick Bailey, Muted Solutions, LLC.
 	// Distributed under MIT license
@@ -15891,14 +15906,14 @@
 	  /* istanbul ignore next */
 	  if (true) {
 	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! backbone */ 3), __webpack_require__(/*! underscore */ 2)], __WEBPACK_AMD_DEFINE_RESULT__ = function(Backbone, _) {
-	      return (root.Marionette = factory(root, Backbone, _));
+	      return (root.Marionette = root.Mn = factory(root, Backbone, _));
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  } else if (typeof exports !== 'undefined') {
 	    var Backbone = require('backbone');
 	    var _ = require('underscore');
 	    module.exports = factory(root, Backbone, _);
 	  } else {
-	    root.Marionette = factory(root, root.Backbone, root._);
+	    root.Marionette = root.Mn = factory(root, root.Backbone, root._);
 	  }
 	
 	}(this, function(root, Backbone, _) {
@@ -16362,7 +16377,7 @@
 	
 	  var Marionette = Backbone.Marionette = {};
 	
-	  Marionette.VERSION = '2.2.0';
+	  Marionette.VERSION = '2.3.0';
 	
 	  Marionette.noConflict = function() {
 	    root.Marionette = previousMarionette;
@@ -16374,19 +16389,25 @@
 	  // Get the Deferred creator for later use
 	  Marionette.Deferred = Backbone.$.Deferred;
 	
-	  /* jshint unused: false */
+	  /* jshint unused: false *//* global console */
 	  
 	  // Helpers
 	  // -------
-	  
-	  // For slicing `arguments` in functions
-	  var slice = Array.prototype.slice;
 	  
 	  // Marionette.extend
 	  // -----------------
 	  
 	  // Borrow the Backbone `extend` method so we can use it as needed
 	  Marionette.extend = Backbone.Model.extend;
+	  
+	  // Marionette.isNodeAttached
+	  // -------------------------
+	  
+	  // Determine if `el` is a child of the document
+	  Marionette.isNodeAttached = function(el) {
+	    return Backbone.$.contains(document.documentElement, el);
+	  };
+	  
 	  
 	  // Marionette.getOption
 	  // --------------------
@@ -16395,15 +16416,11 @@
 	  // object or its `options`, with `options` taking precedence.
 	  Marionette.getOption = function(target, optionName) {
 	    if (!target || !optionName) { return; }
-	    var value;
-	  
 	    if (target.options && (target.options[optionName] !== undefined)) {
-	      value = target.options[optionName];
+	      return target.options[optionName];
 	    } else {
-	      value = target[optionName];
+	      return target[optionName];
 	    }
-	  
-	    return value;
 	  };
 	  
 	  // Proxy `Marionette.getOption`
@@ -16417,17 +16434,15 @@
 	  // Pass in a mapping of events => functions or function names
 	  // and return a mapping of events => functions
 	  Marionette.normalizeMethods = function(hash) {
-	    var normalizedHash = {};
-	    _.each(hash, function(method, name) {
+	    return _.reduce(hash, function(normalizedHash, method, name) {
 	      if (!_.isFunction(method)) {
 	        method = this[method];
 	      }
-	      if (!method) {
-	        return;
+	      if (method) {
+	        normalizedHash[name] = method;
 	      }
-	      normalizedHash[name] = method;
-	    }, this);
-	    return normalizedHash;
+	      return normalizedHash;
+	    }, {}, this);
 	  };
 	  
 	  // utility method for parsing @ui. syntax strings
@@ -16443,37 +16458,22 @@
 	  // swaps the @ui with the associated selector.
 	  // Returns a new, non-mutated, parsed events hash.
 	  Marionette.normalizeUIKeys = function(hash, ui) {
-	    if (typeof(hash) === 'undefined') {
-	      return;
-	    }
-	  
-	    hash = _.clone(hash);
-	  
-	    _.each(_.keys(hash), function(key) {
+	    return _.reduce(hash, function(memo, val, key) {
 	      var normalizedKey = Marionette.normalizeUIString(key, ui);
-	      if (normalizedKey !== key) {
-	        hash[normalizedKey] = hash[key];
-	        delete hash[key];
-	      }
-	    });
-	  
-	    return hash;
+	      memo[normalizedKey] = val;
+	      return memo;
+	    }, {});
 	  };
 	  
 	  // allows for the use of the @ui. syntax within
 	  // a given value for regions
 	  // swaps the @ui with the associated selector
 	  Marionette.normalizeUIValues = function(hash, ui) {
-	    if (typeof(hash) === 'undefined') {
-	      return;
-	    }
-	  
 	    _.each(hash, function(val, key) {
 	      if (_.isString(val)) {
 	        hash[key] = Marionette.normalizeUIString(val, ui);
 	      }
 	    });
-	  
 	    return hash;
 	  };
 	  
@@ -16496,15 +16496,31 @@
 	    });
 	  };
 	  
-	  // Trigger an event and/or a corresponding method name. Examples:
-	  //
-	  // `this.triggerMethod("foo")` will trigger the "foo" event and
-	  // call the "onFoo" method.
-	  //
-	  // `this.triggerMethod("foo:bar")` will trigger the "foo:bar" event and
-	  // call the "onFooBar" method.
-	  Marionette.triggerMethod = function(event) {
+	  var deprecate = Marionette.deprecate = function(message, test) {
+	    if (_.isObject(message)) {
+	      message = (
+	        message.prev + ' is going to be removed in the future. ' +
+	        'Please use ' + message.next + ' instead.' +
+	        (message.url ? ' See: ' + message.url : '')
+	      );
+	    }
 	  
+	    if ((test === undefined || !test) && !deprecate._cache[message]) {
+	      deprecate._warn('Deprecation warning: ' + message);
+	      deprecate._cache[message] = true;
+	    }
+	  };
+	  
+	  deprecate._warn = typeof console !== 'undefined' && (console.warn || console.log) || function() {};
+	  deprecate._cache = {};
+	  
+	  /* jshint maxstatements: 14, maxcomplexity: 7 */
+	  
+	  // Trigger Method
+	  // --------------
+	  
+	  
+	  Marionette._triggerMethod = (function() {
 	    // split the event name on the ":"
 	    var splitter = /(^|:)(\w)/gi;
 	  
@@ -16514,93 +16530,101 @@
 	      return eventName.toUpperCase();
 	    }
 	  
-	    // get the method name from the event name
-	    var methodName = 'on' + event.replace(splitter, getEventName);
-	    var method = this[methodName];
-	    var result;
+	    return function(context, event, args) {
+	      var noEventArg = arguments.length < 3;
+	      if (noEventArg) {
+	        args = event;
+	        event = args[0];
+	      }
 	  
-	    // call the onMethodName if it exists
-	    if (_.isFunction(method)) {
-	      // pass all arguments, except the event name
-	      result = method.apply(this, _.tail(arguments));
-	    }
+	      // get the method name from the event name
+	      var methodName = 'on' + event.replace(splitter, getEventName);
+	      var method = context[methodName];
+	      var result;
 	  
-	    // trigger the event, if a trigger method exists
-	    if (_.isFunction(this.trigger)) {
-	      this.trigger.apply(this, arguments);
-	    }
+	      // call the onMethodName if it exists
+	      if (_.isFunction(method)) {
+	        // pass all args, except the event name
+	        result = method.apply(context, noEventArg ? _.rest(args) : args);
+	      }
 	  
-	    return result;
+	      // trigger the event, if a trigger method exists
+	      if (_.isFunction(context.trigger)) {
+	        if (noEventArg + args.length > 1) {
+	          context.trigger.apply(context, noEventArg ? args : [event].concat(_.rest(args, 0)));
+	        } else {
+	          context.trigger(event);
+	        }
+	      }
+	  
+	      return result;
+	    };
+	  })();
+	  
+	  // Trigger an event and/or a corresponding method name. Examples:
+	  //
+	  // `this.triggerMethod("foo")` will trigger the "foo" event and
+	  // call the "onFoo" method.
+	  //
+	  // `this.triggerMethod("foo:bar")` will trigger the "foo:bar" event and
+	  // call the "onFooBar" method.
+	  Marionette.triggerMethod = function(event) {
+	    return Marionette._triggerMethod(this, arguments);
 	  };
 	  
 	  // triggerMethodOn invokes triggerMethod on a specific context
 	  //
 	  // e.g. `Marionette.triggerMethodOn(view, 'show')`
 	  // will trigger a "show" event or invoke onShow the view.
-	  Marionette.triggerMethodOn = function(context, event) {
-	    var args = _.tail(arguments, 2);
-	    var fnc;
+	  Marionette.triggerMethodOn = function(context) {
+	    var fnc = _.isFunction(context.triggerMethod) ?
+	                  context.triggerMethod :
+	                  Marionette.triggerMethod;
 	  
-	    if (_.isFunction(context.triggerMethod)) {
-	      fnc = context.triggerMethod;
-	    } else {
-	      fnc = Marionette.triggerMethod;
-	    }
-	  
-	    return fnc.apply(context, [event].concat(args));
+	    return fnc.apply(context, _.rest(arguments));
 	  };
 	  
-	  // DOMRefresh
-	  // ----------
-	  //
+	  // DOM Refresh
+	  // -----------
+	  
 	  // Monitor a view's state, and after it has been rendered and shown
 	  // in the DOM, trigger a "dom:refresh" event every time it is
 	  // re-rendered.
 	  
-	  Marionette.MonitorDOMRefresh = (function(documentElement) {
+	  Marionette.MonitorDOMRefresh = function(view) {
+	  
 	    // track when the view has been shown in the DOM,
 	    // using a Marionette.Region (or by other means of triggering "show")
-	    function handleShow(view) {
+	    function handleShow() {
 	      view._isShown = true;
-	      triggerDOMRefresh(view);
+	      triggerDOMRefresh();
 	    }
 	  
 	    // track when the view has been rendered
-	    function handleRender(view) {
+	    function handleRender() {
 	      view._isRendered = true;
-	      triggerDOMRefresh(view);
+	      triggerDOMRefresh();
 	    }
 	  
 	    // Trigger the "dom:refresh" event and corresponding "onDomRefresh" method
-	    function triggerDOMRefresh(view) {
-	      if (view._isShown && view._isRendered && isInDOM(view)) {
+	    function triggerDOMRefresh() {
+	      if (view._isShown && view._isRendered && Marionette.isNodeAttached(view.el)) {
 	        if (_.isFunction(view.triggerMethod)) {
 	          view.triggerMethod('dom:refresh');
 	        }
 	      }
 	    }
 	  
-	    function isInDOM(view) {
-	      return Backbone.$.contains(documentElement, view.el);
-	    }
+	    view.on({
+	      show: handleShow,
+	      render: handleRender
+	    });
+	  };
 	  
-	    // Export public API
-	    return function(view) {
-	      view.listenTo(view, 'show', function() {
-	        handleShow(view);
-	      });
-	  
-	      view.listenTo(view, 'render', function() {
-	        handleRender(view);
-	      });
-	    };
-	  })(document.documentElement);
-	  
-	
 	  /* jshint maxparams: 5 */
 	  
-	  // Marionette.bindEntityEvents & unbindEntityEvents
-	  // ---------------------------
+	  // Bind Entity Events & Unbind Entity Events
+	  // -----------------------------------------
 	  //
 	  // These methods are used to bind/unbind a backbone "entity" (collection/model)
 	  // to methods on a target object.
@@ -16709,10 +16733,13 @@
 	  })(Marionette);
 	  
 	
+	  // Error
+	  // -----
+	  
 	  var errorProps = ['description', 'fileName', 'lineNumber', 'name', 'message', 'number'];
 	  
 	  Marionette.Error = Marionette.extend.call(Error, {
-	    urlRoot: 'http://marionettejs.com/docs/' + Marionette.VERSION + '/',
+	    urlRoot: 'http://marionettejs.com/docs/v' + Marionette.VERSION + '/',
 	  
 	    constructor: function(message, options) {
 	      if (_.isObject(message)) {
@@ -16795,9 +16822,9 @@
 	    }
 	  });
 	  
-	  // Marionette Controller
-	  // ---------------------
-	  //
+	  // Controller
+	  // ----------
+	  
 	  // A multi-purpose object to use as a controller for
 	  // modules and routers, and as a mediator for workflow
 	  // and coordination of other objects, views, and more.
@@ -16817,9 +16844,8 @@
 	  // Ensure it can trigger events with Backbone.Events
 	  _.extend(Marionette.Controller.prototype, Backbone.Events, {
 	    destroy: function() {
-	      var args = slice.call(arguments);
-	      this.triggerMethod.apply(this, ['before:destroy'].concat(args));
-	      this.triggerMethod.apply(this, ['destroy'].concat(args));
+	      Marionette._triggerMethod(this, 'before:destroy', arguments);
+	      Marionette._triggerMethod(this, 'destroy', arguments);
 	  
 	      this.stopListening();
 	      this.off();
@@ -16835,9 +16861,9 @@
 	  
 	  });
 	  
-	  // Marionette Object
-	  // ---------------------
-	  //
+	  // Object
+	  // ------
+	  
 	  // A Base Class that other Classes should descend from.
 	  // Object borrows many conventions and utilities from Backbone.
 	  Marionette.Object = function(options) {
@@ -16851,7 +16877,8 @@
 	  // Object Methods
 	  // --------------
 	  
-	  _.extend(Marionette.Object.prototype, {
+	  // Ensure it can trigger events with Backbone.Events
+	  _.extend(Marionette.Object.prototype, Backbone.Events, {
 	  
 	    //this is a noop method intended to be overridden by classes that extend from this base
 	    initialize: function() {},
@@ -16869,63 +16896,304 @@
 	    // Proxy `getOption` to enable getting options from this or this.options by name.
 	    getOption: Marionette.proxyGetOption,
 	  
-	    // Proxy `unbindEntityEvents` to enable binding view's events from another entity.
+	    // Proxy `bindEntityEvents` to enable binding view's events from another entity.
 	    bindEntityEvents: Marionette.proxyBindEntityEvents,
 	  
 	    // Proxy `unbindEntityEvents` to enable unbinding view's events from another entity.
 	    unbindEntityEvents: Marionette.proxyUnbindEntityEvents
 	  });
 	  
-	  // Ensure it can trigger events with Backbone.Events
-	  _.extend(Marionette.Object.prototype, Backbone.Events);
-	  
-	  /* jshint maxcomplexity: 10, maxstatements: 29 */
+	  /* jshint maxcomplexity: 16, maxstatements: 45, maxlen: 120 */
 	  
 	  // Region
 	  // ------
-	  //
+	  
 	  // Manage the visual regions of your composite application. See
 	  // http://lostechies.com/derickbailey/2011/12/12/composite-js-apps-regions-and-region-managers/
 	  
-	  Marionette.Region = function(options) {
-	    this.options = options || {};
-	    this.el = this.getOption('el');
+	  Marionette.Region = Marionette.Object.extend({
+	    constructor: function (options) {
 	  
-	    // Handle when this.el is passed in as a $ wrapped element.
-	    this.el = this.el instanceof Backbone.$ ? this.el[0] : this.el;
+	      // set options temporarily so that we can get `el`.
+	      // options will be overriden by Object.constructor
+	      this.options = options || {};
+	      this.el = this.getOption('el');
 	  
-	    if (!this.el) {
-	      throw new Marionette.Error({
-	        name: 'NoElError',
-	        message: 'An "el" must be specified for a region.'
-	      });
+	      // Handle when this.el is passed in as a $ wrapped element.
+	      this.el = this.el instanceof Backbone.$ ? this.el[0] : this.el;
+	  
+	      if (!this.el) {
+	        throw new Marionette.Error({
+	          name: 'NoElError',
+	          message: 'An "el" must be specified for a region.'
+	        });
+	      }
+	  
+	      this.$el = this.getEl(this.el);
+	      Marionette.Object.call(this, options);
+	    },
+	  
+	    // Displays a backbone view instance inside of the region.
+	    // Handles calling the `render` method for you. Reads content
+	    // directly from the `el` attribute. Also calls an optional
+	    // `onShow` and `onDestroy` method on your view, just after showing
+	    // or just before destroying the view, respectively.
+	    // The `preventDestroy` option can be used to prevent a view from
+	    // the old view being destroyed on show.
+	    // The `forceShow` option can be used to force a view to be
+	    // re-rendered if it's already shown in the region.
+	    show: function(view, options){
+	      if (!this._ensureElement()) {
+	        return;
+	      }
+	  
+	      this._ensureViewIsIntact(view);
+	  
+	      var showOptions     = options || {};
+	      var isDifferentView = view !== this.currentView;
+	      var preventDestroy  = !!showOptions.preventDestroy;
+	      var forceShow       = !!showOptions.forceShow;
+	  
+	      // We are only changing the view if there is a current view to change to begin with
+	      var isChangingView = !!this.currentView;
+	  
+	      // Only destroy the current view if we don't want to `preventDestroy` and if
+	      // the view given in the first argument is different than `currentView`
+	      var _shouldDestroyView = isDifferentView && !preventDestroy;
+	  
+	      // Only show the view given in the first argument if it is different than
+	      // the current view or if we want to re-show the view. Note that if
+	      // `_shouldDestroyView` is true, then `_shouldShowView` is also necessarily true.
+	      var _shouldShowView = isDifferentView || forceShow;
+	  
+	      if (isChangingView) {
+	        this.triggerMethod('before:swapOut', this.currentView, this, options);
+	      }
+	  
+	      if (this.currentView) {
+	        delete this.currentView._parent;
+	      }
+	  
+	      if (_shouldDestroyView) {
+	        this.empty();
+	  
+	      // A `destroy` event is attached to the clean up manually removed views.
+	      // We need to detach this event when a new view is going to be shown as it
+	      // is no longer relevant.
+	      } else if (isChangingView && _shouldShowView) {
+	        this.currentView.off('destroy', this.empty, this);
+	      }
+	  
+	      if (_shouldShowView) {
+	  
+	        // We need to listen for if a view is destroyed
+	        // in a way other than through the region.
+	        // If this happens we need to remove the reference
+	        // to the currentView since once a view has been destroyed
+	        // we can not reuse it.
+	        view.once('destroy', this.empty, this);
+	        view.render();
+	  
+	        view._parent = this;
+	  
+	        if (isChangingView) {
+	          this.triggerMethod('before:swap', view, this, options);
+	        }
+	  
+	        this.triggerMethod('before:show', view, this, options);
+	        Marionette.triggerMethodOn(view, 'before:show', view, this, options);
+	  
+	        if (isChangingView) {
+	          this.triggerMethod('swapOut', this.currentView, this, options);
+	        }
+	  
+	        // An array of views that we're about to display
+	        var attachedRegion = Marionette.isNodeAttached(this.el);
+	  
+	        // The views that we're about to attach to the document
+	        // It's important that we prevent _getNestedViews from being executed unnecessarily
+	        // as it's a potentially-slow method
+	        var displayedViews = [];
+	  
+	        var triggerBeforeAttach = showOptions.triggerBeforeAttach || this.triggerBeforeAttach;
+	        var triggerAttach = showOptions.triggerAttach || this.triggerAttach;
+	  
+	        if (attachedRegion && triggerBeforeAttach) {
+	          displayedViews = this._displayedViews(view);
+	          this._triggerAttach(displayedViews, 'before:');
+	        }
+	  
+	        this.attachHtml(view);
+	        this.currentView = view;
+	  
+	        if (attachedRegion && triggerAttach) {
+	          displayedViews = this._displayedViews(view);
+	          this._triggerAttach(displayedViews);
+	        }
+	  
+	        if (isChangingView) {
+	          this.triggerMethod('swap', view, this, options);
+	        }
+	  
+	        this.triggerMethod('show', view, this, options);
+	        Marionette.triggerMethodOn(view, 'show', view, this, options);
+	  
+	        return this;
+	      }
+	  
+	      return this;
+	    },
+	  
+	    triggerBeforeAttach: true,
+	    triggerAttach: true,
+	  
+	    _triggerAttach: function(views, prefix) {
+	      var eventName = (prefix || '') + 'attach';
+	      _.each(views, function(view) {
+	        Marionette.triggerMethodOn(view, eventName, view, this);
+	      }, this);
+	    },
+	  
+	    _displayedViews: function(view) {
+	      return _.union([view], _.result(view, '_getNestedViews') || []);
+	    },
+	  
+	    _ensureElement: function(){
+	      if (!_.isObject(this.el)) {
+	        this.$el = this.getEl(this.el);
+	        this.el = this.$el[0];
+	      }
+	  
+	      if (!this.$el || this.$el.length === 0) {
+	        if (this.getOption('allowMissingEl')) {
+	          return false;
+	        } else {
+	          throw new Marionette.Error('An "el" ' + this.$el.selector + ' must exist in DOM');
+	        }
+	      }
+	      return true;
+	    },
+	  
+	    _ensureViewIsIntact: function(view) {
+	      if (!view) {
+	        throw new Marionette.Error({
+	          name: 'ViewNotValid',
+	          message: 'The view passed is undefined and therefore invalid. You must pass a view instance to show.'
+	        });
+	      }
+	  
+	      if (view.isDestroyed) {
+	        throw new Marionette.Error({
+	          name: 'ViewDestroyedError',
+	          message: 'View (cid: "' + view.cid + '") has already been destroyed and cannot be used.'
+	        });
+	      }
+	    },
+	  
+	    // Override this method to change how the region finds the
+	    // DOM element that it manages. Return a jQuery selector object.
+	    getEl: function(el) {
+	      return Backbone.$(el);
+	    },
+	  
+	    // Override this method to change how the new view is
+	    // appended to the `$el` that the region is managing
+	    attachHtml: function(view) {
+	      // empty the node and append new view
+	      // We can not use `.innerHTML` due to the fact that IE
+	      // will not let us clear the html of tables and selects.
+	      // We also do not want to use the more declarative `empty` method
+	      // that jquery exposes since `.empty` loops over all of the children DOM
+	      // nodes and unsets the listeners on each node. While this seems like
+	      // a desirable thing, it comes at quite a high perf cost. For that reason
+	      // we are simply clearing the html contents of the node.
+	      this.$el.html('');
+	      this.el.appendChild(view.el);
+	    },
+	  
+	    // Destroy the current view, if there is one. If there is no
+	    // current view, it does nothing and returns immediately.
+	    empty: function() {
+	      var view = this.currentView;
+	  
+	      // If there is no view in the region
+	      // we should not remove anything
+	      if (!view) { return; }
+	  
+	      view.off('destroy', this.empty, this);
+	      this.triggerMethod('before:empty', view);
+	      this._destroyView();
+	      this.triggerMethod('empty', view);
+	  
+	      // Remove region pointer to the currentView
+	      delete this.currentView;
+	      return this;
+	    },
+	  
+	    // call 'destroy' or 'remove', depending on which is found
+	    // on the view (if showing a raw Backbone view or a Marionette View)
+	    _destroyView: function() {
+	      var view = this.currentView;
+	  
+	      if (view.destroy && !view.isDestroyed) {
+	        view.destroy();
+	      } else if (view.remove) {
+	        view.remove();
+	  
+	        // appending isDestroyed to raw Backbone View allows regions
+	        // to throw a ViewDestroyedError for this view
+	        view.isDestroyed = true;
+	      }
+	    },
+	  
+	    // Attach an existing view to the region. This
+	    // will not call `render` or `onShow` for the new view,
+	    // and will not replace the current HTML for the `el`
+	    // of the region.
+	    attachView: function(view) {
+	      this.currentView = view;
+	      return this;
+	    },
+	  
+	    // Checks whether a view is currently present within
+	    // the region. Returns `true` if there is and `false` if
+	    // no view is present.
+	    hasView: function() {
+	      return !!this.currentView;
+	    },
+	  
+	    // Reset the region by destroying any existing view and
+	    // clearing out the cached `$el`. The next time a view
+	    // is shown via this region, the region will re-query the
+	    // DOM for the region's `el`.
+	    reset: function() {
+	      this.empty();
+	  
+	      if (this.$el) {
+	        this.el = this.$el.selector;
+	      }
+	  
+	      delete this.$el;
+	      return this;
 	    }
 	  
-	    this.$el = this.getEl(this.el);
+	  },
 	  
-	    if (this.initialize) {
-	      var args = slice.apply(arguments);
-	      this.initialize.apply(this, args);
-	    }
-	  };
-	  
-	  
-	  // Region Class methods
-	  // -------------------
-	  
-	  _.extend(Marionette.Region, {
+	  // Static Methods
+	  {
 	  
 	    // Build an instance of a region by passing in a configuration object
 	    // and a default region class to use if none is specified in the config.
 	    //
 	    // The config object should either be a string as a jQuery DOM selector,
-	    // a Region class directly, or an object literal that specifies both
-	    // a selector and regionClass:
+	    // a Region class directly, or an object literal that specifies a selector,
+	    // a custom regionClass, and any options to be supplied to the region:
 	    //
 	    // ```js
 	    // {
 	    //   selector: "#foo",
-	    //   regionClass: MyCustomRegion
+	    //   regionClass: MyCustomRegion,
+	    //   allowMissingEl: false
 	    // }
 	    // ```
 	    //
@@ -16955,7 +17223,7 @@
 	  
 	    // Build the region from a configuration object
 	    // ```js
-	    // { selector: '#foo', regionClass: FooRegion }
+	    // { selector: '#foo', regionClass: FooRegion, allowMissingEl: false }
 	    // ```
 	    _buildRegionFromObject: function(regionConfig, DefaultRegionClass) {
 	      var RegionClass = regionConfig.regionClass || DefaultRegionClass;
@@ -16993,316 +17261,138 @@
 	    _buildRegionFromRegionClass: function(RegionClass) {
 	      return new RegionClass();
 	    }
-	  
 	  });
 	  
-	  // Region Instance Methods
-	  // -----------------------
+	  // Region Manager
+	  // --------------
 	  
-	  _.extend(Marionette.Region.prototype, Backbone.Events, {
-	  
-	    // Displays a backbone view instance inside of the region.
-	    // Handles calling the `render` method for you. Reads content
-	    // directly from the `el` attribute. Also calls an optional
-	    // `onShow` and `onDestroy` method on your view, just after showing
-	    // or just before destroying the view, respectively.
-	    // The `preventDestroy` option can be used to prevent a view from
-	    // the old view being destroyed on show.
-	    // The `forceShow` option can be used to force a view to be
-	    // re-rendered if it's already shown in the region.
-	  
-	    show: function(view, options){
-	      this._ensureElement();
-	  
-	      var showOptions = options || {};
-	      var isDifferentView = view !== this.currentView;
-	      var preventDestroy =  !!showOptions.preventDestroy;
-	      var forceShow = !!showOptions.forceShow;
-	  
-	      // we are only changing the view if there is a view to change to begin with
-	      var isChangingView = !!this.currentView;
-	  
-	      // only destroy the view if we don't want to preventDestroy and the view is different
-	      var _shouldDestroyView = !preventDestroy && isDifferentView;
-	  
-	      // show the view if the view is different or if you want to re-show the view
-	      var _shouldShowView = isDifferentView || forceShow;
-	  
-	      if (isChangingView) {
-	        this.triggerMethod('before:swapOut', this.currentView);
-	      }
-	  
-	      if (_shouldDestroyView) {
-	        this.empty();
-	      }
-	  
-	      if (_shouldShowView) {
-	  
-	        // We need to listen for if a view is destroyed
-	        // in a way other than through the region.
-	        // If this happens we need to remove the reference
-	        // to the currentView since once a view has been destroyed
-	        // we can not reuse it.
-	        view.once('destroy', _.bind(this.empty, this));
-	        view.render();
-	  
-	        if (isChangingView) {
-	          this.triggerMethod('before:swap', view);
-	        }
-	  
-	        this.triggerMethod('before:show', view);
-	        Marionette.triggerMethodOn(view, 'before:show');
-	  
-	        if (isChangingView) {
-	          this.triggerMethod('swapOut', this.currentView);
-	        }
-	  
-	        this.attachHtml(view);
-	        this.currentView = view;
-	  
-	        if (isChangingView) {
-	          this.triggerMethod('swap', view);
-	        }
-	  
-	        this.triggerMethod('show', view);
-	        Marionette.triggerMethodOn(view, 'show');
-	  
-	        return this;
-	      }
-	  
-	      return this;
-	    },
-	  
-	    _ensureElement: function(){
-	      if (!_.isObject(this.el)) {
-	        this.$el = this.getEl(this.el);
-	        this.el = this.$el[0];
-	      }
-	  
-	      if (!this.$el || this.$el.length === 0) {
-	        throw new Marionette.Error('An "el" ' + this.$el.selector + ' must exist in DOM');
-	      }
-	    },
-	  
-	    // Override this method to change how the region finds the
-	    // DOM element that it manages. Return a jQuery selector object.
-	    getEl: function(el) {
-	      return Backbone.$(el);
-	    },
-	  
-	    // Override this method to change how the new view is
-	    // appended to the `$el` that the region is managing
-	    attachHtml: function(view) {
-	      // empty the node and append new view
-	      this.el.innerHTML='';
-	      this.el.appendChild(view.el);
-	    },
-	  
-	    // Destroy the current view, if there is one. If there is no
-	    // current view, it does nothing and returns immediately.
-	    empty: function() {
-	      var view = this.currentView;
-	  
-	      // If there is no view in the region
-	      // we should not remove anything
-	      if (!view) { return; }
-	  
-	      this.triggerMethod('before:empty', view);
-	      this._destroyView();
-	      this.triggerMethod('empty', view);
-	  
-	      // Remove region pointer to the currentView
-	      delete this.currentView;
-	      return this;
-	    },
-	  
-	    // call 'destroy' or 'remove', depending on which is found
-	    // on the view (if showing a raw Backbone view or a Marionette View)
-	    _destroyView: function() {
-	      var view = this.currentView;
-	  
-	      if (view.destroy && !view.isDestroyed) {
-	        view.destroy();
-	      } else if (view.remove) {
-	        view.remove();
-	      }
-	    },
-	  
-	    // Attach an existing view to the region. This
-	    // will not call `render` or `onShow` for the new view,
-	    // and will not replace the current HTML for the `el`
-	    // of the region.
-	    attachView: function(view) {
-	      this.currentView = view;
-	      return this;
-	    },
-	  
-	    // Checks whether a view is currently present within
-	    // the region. Returns `true` if there is and `false` if
-	    // no view is present.
-	    hasView: function() {
-	      return !!this.currentView;
-	    },
-	  
-	    // Reset the region by destroying any existing view and
-	    // clearing out the cached `$el`. The next time a view
-	    // is shown via this region, the region will re-query the
-	    // DOM for the region's `el`.
-	    reset: function() {
-	      this.empty();
-	  
-	      if (this.$el) {
-	        this.el = this.$el.selector;
-	      }
-	  
-	      delete this.$el;
-	      return this;
-	    },
-	  
-	    // Proxy `getOption` to enable getting options from this or this.options by name.
-	    getOption: Marionette.proxyGetOption,
-	  
-	    // import the `triggerMethod` to trigger events with corresponding
-	    // methods if the method exists
-	    triggerMethod: Marionette.triggerMethod
-	  });
-	  
-	  // Copy the `extend` function used by Backbone's classes
-	  Marionette.Region.extend = Marionette.extend;
-	  
-	  // Marionette.RegionManager
-	  // ------------------------
-	  //
 	  // Manage one or more related `Marionette.Region` objects.
-	  Marionette.RegionManager = (function(Marionette) {
+	  Marionette.RegionManager = Marionette.Controller.extend({
+	    constructor: function(options) {
+	      this._regions = {};
 	  
-	    var RegionManager = Marionette.Controller.extend({
-	      constructor: function(options) {
-	        this._regions = {};
-	        Marionette.Controller.call(this, options);
-	      },
+	      Marionette.Controller.call(this, options);
 	  
-	      // Add multiple regions using an object literal or a
-	      // function that returns an object literal, where
-	      // each key becomes the region name, and each value is
-	      // the region definition.
-	      addRegions: function(regionDefinitions, defaults) {
-	        if (_.isFunction(regionDefinitions)) {
-	          regionDefinitions = regionDefinitions.apply(this, arguments);
-	        }
+	      this.addRegions(this.getOption('regions'));
+	    },
 	  
-	        var regions = {};
-	  
-	        _.each(regionDefinitions, function(definition, name) {
-	          if (_.isString(definition)) {
-	            definition = {selector: definition};
-	          }
-	  
-	          if (definition.selector) {
-	            definition = _.defaults({}, definition, defaults);
-	          }
-	  
-	          var region = this.addRegion(name, definition);
-	          regions[name] = region;
-	        }, this);
-	  
-	        return regions;
-	      },
-	  
-	      // Add an individual region to the region manager,
-	      // and return the region instance
-	      addRegion: function(name, definition) {
-	        var region;
-	  
-	        if (definition instanceof Marionette.Region) {
-	          region = definition;
-	        } else {
-	          region = Marionette.Region.buildRegion(definition, Marionette.Region);
-	        }
-	  
-	        this.triggerMethod('before:add:region', name, region);
-	  
-	        this._store(name, region);
-	  
-	        this.triggerMethod('add:region', name, region);
-	        return region;
-	      },
-	  
-	      // Get a region by name
-	      get: function(name) {
-	        return this._regions[name];
-	      },
-	  
-	      // Gets all the regions contained within
-	      // the `regionManager` instance.
-	      getRegions: function(){
-	        return _.clone(this._regions);
-	      },
-	  
-	      // Remove a region by name
-	      removeRegion: function(name) {
-	        var region = this._regions[name];
-	        this._remove(name, region);
-	  
-	        return region;
-	      },
-	  
-	      // Empty all regions in the region manager, and
-	      // remove them
-	      removeRegions: function() {
-	        var regions = this.getRegions();
-	        _.each(this._regions, function(region, name) {
-	          this._remove(name, region);
-	        }, this);
-	  
-	        return regions;
-	      },
-	  
-	      // Empty all regions in the region manager, but
-	      // leave them attached
-	      emptyRegions: function() {
-	        var regions = this.getRegions();
-	        _.each(regions, function(region) {
-	          region.empty();
-	        }, this);
-	  
-	        return regions;
-	      },
-	  
-	      // Destroy all regions and shut down the region
-	      // manager entirely
-	      destroy: function() {
-	        this.removeRegions();
-	        return Marionette.Controller.prototype.destroy.apply(this, arguments);
-	      },
-	  
-	      // internal method to store regions
-	      _store: function(name, region) {
-	        this._regions[name] = region;
-	        this._setLength();
-	      },
-	  
-	      // internal method to remove a region
-	      _remove: function(name, region) {
-	        this.triggerMethod('before:remove:region', name, region);
-	        region.empty();
-	        region.stopListening();
-	        delete this._regions[name];
-	        this._setLength();
-	        this.triggerMethod('remove:region', name, region);
-	      },
-	  
-	      // set the number of regions current held
-	      _setLength: function() {
-	        this.length = _.size(this._regions);
+	    // Add multiple regions using an object literal or a
+	    // function that returns an object literal, where
+	    // each key becomes the region name, and each value is
+	    // the region definition.
+	    addRegions: function(regionDefinitions, defaults) {
+	      if (_.isFunction(regionDefinitions)) {
+	        regionDefinitions = regionDefinitions.apply(this, arguments);
 	      }
 	  
-	    });
+	      var regions = {};
 	  
-	    Marionette.actAsCollection(RegionManager.prototype, '_regions');
+	      _.each(regionDefinitions, function(definition, name) {
+	        if (_.isString(definition)) {
+	          definition = {selector: definition};
+	        }
 	  
-	    return RegionManager;
-	  })(Marionette);
+	        if (definition.selector) {
+	          definition = _.defaults({}, definition, defaults);
+	        }
+	  
+	        var region = this.addRegion(name, definition);
+	        regions[name] = region;
+	      }, this);
+	  
+	      return regions;
+	    },
+	  
+	    // Add an individual region to the region manager,
+	    // and return the region instance
+	    addRegion: function(name, definition) {
+	      var region;
+	  
+	      if (definition instanceof Marionette.Region) {
+	        region = definition;
+	      } else {
+	        region = Marionette.Region.buildRegion(definition, Marionette.Region);
+	      }
+	  
+	      this.triggerMethod('before:add:region', name, region);
+	  
+	      region._parent = this;
+	      this._store(name, region);
+	  
+	      this.triggerMethod('add:region', name, region);
+	      return region;
+	    },
+	  
+	    // Get a region by name
+	    get: function(name) {
+	      return this._regions[name];
+	    },
+	  
+	    // Gets all the regions contained within
+	    // the `regionManager` instance.
+	    getRegions: function(){
+	      return _.clone(this._regions);
+	    },
+	  
+	    // Remove a region by name
+	    removeRegion: function(name) {
+	      var region = this._regions[name];
+	      this._remove(name, region);
+	  
+	      return region;
+	    },
+	  
+	    // Empty all regions in the region manager, and
+	    // remove them
+	    removeRegions: function() {
+	      var regions = this.getRegions();
+	      _.each(this._regions, function(region, name) {
+	        this._remove(name, region);
+	      }, this);
+	  
+	      return regions;
+	    },
+	  
+	    // Empty all regions in the region manager, but
+	    // leave them attached
+	    emptyRegions: function() {
+	      var regions = this.getRegions();
+	      _.invoke(regions, 'empty');
+	      return regions;
+	    },
+	  
+	    // Destroy all regions and shut down the region
+	    // manager entirely
+	    destroy: function() {
+	      this.removeRegions();
+	      return Marionette.Controller.prototype.destroy.apply(this, arguments);
+	    },
+	  
+	    // internal method to store regions
+	    _store: function(name, region) {
+	      this._regions[name] = region;
+	      this._setLength();
+	    },
+	  
+	    // internal method to remove a region
+	    _remove: function(name, region) {
+	      this.triggerMethod('before:remove:region', name, region);
+	      region.empty();
+	      region.stopListening();
+	  
+	      delete region._parent;
+	      delete this._regions[name];
+	      this._setLength();
+	      this.triggerMethod('remove:region', name, region);
+	    },
+	  
+	    // set the number of regions current held
+	    _setLength: function() {
+	      this.length = _.size(this._regions);
+	    }
+	  });
+	  
+	  Marionette.actAsCollection(Marionette.RegionManager.prototype, '_regions');
 	  
 	
 	  // Template Cache
@@ -17343,7 +17433,7 @@
 	    // `clear("#t1", "#t2", "...")`
 	    clear: function() {
 	      var i;
-	      var args = slice.call(arguments);
+	      var args = _.toArray(arguments);
 	      var length = args.length;
 	  
 	      if (length > 0) {
@@ -17434,8 +17524,8 @@
 	  
 	
 	  /* jshint maxlen: 114, nonew: false */
-	  // Marionette.View
-	  // ---------------
+	  // View
+	  // ----
 	  
 	  // The core view class that other Marionette views extend from.
 	  Marionette.View = Backbone.View.extend({
@@ -17443,18 +17533,20 @@
 	    constructor: function(options) {
 	      _.bindAll(this, 'render');
 	  
+	      options = _.isFunction(options) ? options.call(this) : options;
+	  
 	      // this exposes view options to the view initializer
 	      // this is a backfill since backbone removed the assignment
 	      // of this.options
 	      // at some point however this may be removed
-	      this.options = _.extend({}, _.result(this, 'options'), _.isFunction(options) ? options.call(this) : options);
+	      this.options = _.extend({}, _.result(this, 'options'), options);
 	  
 	      this._behaviors = Marionette.Behaviors(this);
 	  
 	      Backbone.View.apply(this, arguments);
 	  
 	      Marionette.MonitorDOMRefresh(this);
-	      this.listenTo(this, 'show', this.onShowCalled);
+	      this.on('show', this.onShowCalled);
 	    },
 	  
 	    // Get the template for this view
@@ -17468,7 +17560,7 @@
 	    // Serialize a model by returning its attributes. Clones
 	    // the attributes to allow modification.
 	    serializeModel: function(model){
-	      return model.toJSON.apply(model, slice.call(arguments, 1));
+	      return model.toJSON.apply(model, _.rest(arguments));
 	    },
 	  
 	    // Mix in template helper methods. Looks for a
@@ -17488,9 +17580,8 @@
 	    // normalize the keys of passed hash with the views `ui` selectors.
 	    // `{"@ui.foo": "bar"}`
 	    normalizeUIKeys: function(hash) {
-	      var ui = _.result(this, 'ui');
 	      var uiBindings = _.result(this, '_uiBindings');
-	      return Marionette.normalizeUIKeys(hash, uiBindings || ui);
+	      return Marionette.normalizeUIKeys(hash, uiBindings || _.result(this, 'ui'));
 	    },
 	  
 	    // normalize the values of passed hash with the views `ui` selectors.
@@ -17506,18 +17597,15 @@
 	    configureTriggers: function() {
 	      if (!this.triggers) { return; }
 	  
-	      var triggerEvents = {};
-	  
 	      // Allow `triggers` to be configured as a function
 	      var triggers = this.normalizeUIKeys(_.result(this, 'triggers'));
 	  
 	      // Configure the triggers, prevent default
 	      // action and stop propagation of DOM events
-	      _.each(triggers, function(value, key) {
-	        triggerEvents[key] = this._buildViewTrigger(value);
-	      }, this);
-	  
-	      return triggerEvents;
+	      return _.reduce(triggers, function(events, value, key) {
+	        events[key] = this._buildViewTrigger(value);
+	        return events;
+	      }, {}, this);
 	    },
 	  
 	    // Overriding Backbone.View's delegateEvents to handle
@@ -17560,8 +17648,7 @@
 	    // Overriding Backbone.View's undelegateEvents to handle unbinding
 	    // the `triggers`, `modelEvents`, and `collectionEvents` config
 	    undelegateEvents: function() {
-	      var args = slice.call(arguments);
-	      Backbone.View.prototype.undelegateEvents.apply(this, args);
+	      Backbone.View.prototype.undelegateEvents.apply(this, arguments);
 	  
 	      this.unbindEntityEvents(this.model, this.getOption('modelEvents'));
 	      this.unbindEntityEvents(this.collection, this.getOption('collectionEvents'));
@@ -17594,7 +17681,7 @@
 	    destroy: function() {
 	      if (this.isDestroyed) { return; }
 	  
-	      var args = slice.call(arguments);
+	      var args = _.toArray(arguments);
 	  
 	      this.triggerMethod.apply(this, ['before:destroy'].concat(args));
 	  
@@ -17613,7 +17700,7 @@
 	      // Call destroy on each behavior after
 	      // destroying the view.
 	      // This unbinds event listeners
-	      // that behaviors have registerd for.
+	      // that behaviors have registered for.
 	      _.invoke(this._behaviors, 'destroy', args);
 	  
 	      return this;
@@ -17714,15 +17801,33 @@
 	    // import the `triggerMethod` to trigger events with corresponding
 	    // methods if the method exists
 	    triggerMethod: function() {
-	      var args = arguments;
-	      var triggerMethod = Marionette.triggerMethod;
-	  
-	      var ret = triggerMethod.apply(this, args);
-	      _.each(this._behaviors, function(b) {
-	        triggerMethod.apply(b, args);
-	      });
+	      var triggerMethod = Marionette._triggerMethod;
+	      var ret = triggerMethod(this, arguments);
+	      var behaviors = this._behaviors;
+	      // Use good ol' for as this is a very hot function
+	      for (var i = 0, length = behaviors && behaviors.length; i < length; i++) {
+	        triggerMethod(behaviors[i], arguments);
+	      }
 	  
 	      return ret;
+	    },
+	  
+	    // This method returns any views that are immediate
+	    // children of this view
+	    _getImmediateChildren: function() {
+	      return [];
+	    },
+	  
+	    // Returns an array of every nested view within this view
+	    _getNestedViews: function() {
+	      var children = this._getImmediateChildren();
+	  
+	      if (!children.length) { return children; }
+	  
+	      return _.reduce(children, function(memo, view) {
+	        if (!view._getNestedViews) { return memo; }
+	        return memo.concat(view._getNestedViews());
+	      }, children);
 	    },
 	  
 	    // Imports the "normalizeMethods" to transform hashes of
@@ -17732,7 +17837,7 @@
 	    // Proxy `getOption` to enable getting options from this or this.options by name.
 	    getOption: Marionette.proxyGetOption,
 	  
-	    // Proxy `unbindEntityEvents` to enable binding view's events from another entity.
+	    // Proxy `bindEntityEvents` to enable binding view's events from another entity.
 	    bindEntityEvents: Marionette.proxyBindEntityEvents,
 	  
 	    // Proxy `unbindEntityEvents` to enable unbinding view's events from another entity.
@@ -17761,21 +17866,27 @@
 	    // You can override the `serializeData` method in your own view definition,
 	    // to provide custom serialization for your view's data.
 	    serializeData: function(){
-	      var data = {};
+	      if (!this.model && !this.collection) {
+	        return {};
+	      }
+	  
+	      var args = [this.model || this.collection];
+	      if (arguments.length) {
+	        args.push.apply(args, arguments);
+	      }
 	  
 	      if (this.model) {
-	        data = _.partial(this.serializeModel, this.model).apply(this, arguments);
+	        return this.serializeModel.apply(this, args);
+	      } else {
+	        return {
+	          items: this.serializeCollection.apply(this, args)
+	        };
 	      }
-	      else if (this.collection) {
-	        data = { items: _.partial(this.serializeCollection, this.collection).apply(this, arguments) };
-	      }
-	  
-	      return data;
 	    },
 	  
 	    // Serialize a collection by serializing each of its models.
 	    serializeCollection: function(collection){
-	      return collection.toJSON.apply(collection, slice.call(arguments, 1));
+	      return collection.toJSON.apply(collection, _.rest(arguments));
 	    },
 	  
 	    // Render the view, defaulting to underscore.js templates.
@@ -17842,19 +17953,10 @@
 	      this.$el.html(html);
 	  
 	      return this;
-	    },
-	  
-	    // Override the default destroy event to add a few
-	    // more events that are triggered.
-	    destroy: function() {
-	      if (this.isDestroyed) { return; }
-	  
-	      return Marionette.View.prototype.destroy.apply(this, arguments);
 	    }
 	  });
 	  
 	  /* jshint maxstatements: 14 */
-	  /* jshint maxlen: 200 */
 	  
 	  // Collection View
 	  // ---------------
@@ -17873,14 +17975,11 @@
 	    // This will fallback onto appending childView's to the end.
 	    constructor: function(options){
 	      var initOptions = options || {};
-	      this.sort = _.isUndefined(initOptions.sort) ? true : initOptions.sort;
-	  
-	      if (initOptions.collection && !(initOptions.collection instanceof Backbone.Collection)) {
-	        throw new Marionette.Error('The Collection option passed to this view needs to be an instance of a Backbone.Collection');
+	      if (_.isUndefined(this.sort)){
+	        this.sort = _.isUndefined(initOptions.sort) ? true : initOptions.sort;
 	      }
 	  
 	      this.once('render', this._initialEvents);
-	  
 	      this._initChildViewStorage();
 	  
 	      Marionette.View.apply(this, arguments);
@@ -17996,6 +18095,9 @@
 	      }
 	    },
 	  
+	    // Internal reference to what index a `emptyView` is.
+	    _emptyViewIndex: -1,
+	  
 	    // Internal method. Separated so that CompositeView can have
 	    // more control over events being triggered, around the rendering
 	    // process
@@ -18068,11 +18170,13 @@
 	                            this.getOption('childViewOptions');
 	  
 	      if (_.isFunction(emptyViewOptions)){
-	        emptyViewOptions = emptyViewOptions.call(this);
+	        emptyViewOptions = emptyViewOptions.call(this, child, this._emptyViewIndex);
 	      }
 	  
 	      // build the empty view
 	      var view = this.buildChildView(child, EmptyView, emptyViewOptions);
+	  
+	      view._parent = this;
 	  
 	      // Proxy emptyView events
 	      this.proxyChildEvents(view);
@@ -18088,7 +18192,7 @@
 	      this.children.add(view);
 	  
 	      // Render it and show it
-	      this.renderChildView(view, -1);
+	      this.renderChildView(view, this._emptyViewIndex);
 	  
 	      // call the 'show' method if the collection view
 	      // has already been shown
@@ -18132,6 +18236,8 @@
 	      this._updateIndices(view, true, index);
 	  
 	      this._addChildView(view, index);
+	  
+	      view._parent = this;
 	  
 	      return view;
 	    },
@@ -18210,6 +18316,7 @@
 	        if (view.destroy) { view.destroy(); }
 	        else if (view.remove) { view.remove(); }
 	  
+	        delete view._parent;
 	        this.stopListening(view);
 	        this.children.remove(view);
 	        this.triggerMethod('remove:child', view);
@@ -18318,7 +18425,7 @@
 	      // Forward all child view events through the parent,
 	      // prepending "childview:" to the event name
 	      this.listenTo(view, 'all', function() {
-	        var args = slice.call(arguments);
+	        var args = _.toArray(arguments);
 	        var rootEvent = args[0];
 	        var childEvents = this.normalizeMethods(_.result(this, 'childEvents'));
 	  
@@ -18332,6 +18439,10 @@
 	  
 	        this.triggerMethod.apply(this, args);
 	      }, this);
+	    },
+	  
+	    _getImmediateChildren: function() {
+	      return _.values(this.children._views);
 	    }
 	  });
 	  
@@ -18380,17 +18491,10 @@
 	    getChildView: function(child) {
 	      var childView = this.getOption('childView') || this.constructor;
 	  
-	      if (!childView) {
-	        throw new Marionette.Error({
-	          name: 'NoChildViewError',
-	          message: 'A "childView" must be specified'
-	        });
-	      }
-	  
 	      return childView;
 	    },
 	  
-	    // Serialize the collection for the view.
+	    // Serialize the model for the view.
 	    // You can override the `serializeData` method in your own view
 	    // definition, to provide custom serialization for your view's data.
 	    serializeData: function() {
@@ -18403,9 +18507,7 @@
 	      return data;
 	    },
 	  
-	    // Renders the model once, and the collection once. Calling
-	    // this again will tell the model's view to re-render itself
-	    // but the collection will not re-render.
+	    // Renders the model and the collection.
 	    render: function() {
 	      this._ensureViewIsIntact();
 	      this.isRendered = true;
@@ -18474,13 +18576,13 @@
 	    // Overidden from CollectionView to ensure view is appended to
 	    // childViewContainer
 	    _insertAfter: function (childView) {
-	      var $container = this.getChildViewContainer(this);
+	      var $container = this.getChildViewContainer(this, childView);
 	      $container.append(childView.el);
 	    },
 	  
 	    // Internal method to ensure an `$childViewContainer` exists, for the
 	    // `attachHtml` method to use.
-	    getChildViewContainer: function(containerView) {
+	    getChildViewContainer: function(containerView, childView) {
 	      if ('$childViewContainer' in containerView) {
 	        return containerView.$childViewContainer;
 	      }
@@ -18520,8 +18622,8 @@
 	    }
 	  });
 	  
-	  // LayoutView
-	  // ----------
+	  // Layout View
+	  // -----------
 	  
 	  // Used for managing application layoutViews, nested layoutViews and
 	  // multiple regions within an application or sub-application.
@@ -18573,7 +18675,6 @@
 	  
 	    // Add a single region, by name, to the layoutView
 	    addRegion: function(name, definition) {
-	      this.triggerMethod('before:region:add', name);
 	      var regions = {};
 	      regions[name] = definition;
 	      return this._buildRegions(regions)[name];
@@ -18587,7 +18688,6 @@
 	  
 	    // Remove a single region from the LayoutView, by name
 	    removeRegion: function(name) {
-	      this.triggerMethod('before:region:remove', name);
 	      delete this.regions[name];
 	      return this.regionManager.removeRegion(name);
 	    },
@@ -18606,11 +18706,9 @@
 	  
 	    // internal method to build regions
 	    _buildRegions: function(regions) {
-	      var that = this;
-	  
 	      var defaults = {
 	        regionClass: this.getOption('regionClass'),
-	        parentEl: function() { return that.$el; }
+	        parentEl: _.partial(_.result, this, '$el')
 	      };
 	  
 	      return this.regionManager.addRegions(regions, defaults);
@@ -18648,10 +18746,7 @@
 	    // Internal method to re-initialize all of the regions by updating the `el` that
 	    // they point to
 	    _reInitializeRegions: function() {
-	      this.regionManager.emptyRegions();
-	      this.regionManager.each(function(region) {
-	        region.reset();
-	      });
+	      this.regionManager.invoke('reset');
 	    },
 	  
 	    // Enable easy overriding of the default `RegionManager`
@@ -18665,6 +18760,7 @@
 	    // and all regions in it
 	    _initRegionManager: function() {
 	      this.regionManager = this.getRegionManager();
+	      this.regionManager._parent = this;
 	  
 	      this.listenTo(this.regionManager, 'before:add:region', function(name) {
 	        this.triggerMethod('before:add:region', name);
@@ -18683,20 +18779,27 @@
 	        delete this[name];
 	        this.triggerMethod('remove:region', name, region);
 	      });
+	    },
+	  
+	    _getImmediateChildren: function() {
+	      return _.chain(this.regionManager.getRegions())
+	        .pluck('currentView')
+	        .compact()
+	        .value();
 	    }
 	  });
 	  
 	
 	  // Behavior
-	  // -----------
+	  // --------
 	  
 	  // A Behavior is an isolated set of DOM /
 	  // user interactions that can be mixed into any View.
 	  // Behaviors allow you to blackbox View specific interactions
 	  // into portable logical chunks, keeping your views simple and your code DRY.
 	  
-	  Marionette.Behavior = (function(_, Backbone) {
-	    function Behavior(options, view) {
+	  Marionette.Behavior = Marionette.Object.extend({
+	    constructor: function(options, view) {
 	      // Setup reference to the view.
 	      // this comes in handle when a behavior
 	      // wants to directly talk up the chain
@@ -18705,57 +18808,31 @@
 	      this.defaults = _.result(this, 'defaults') || {};
 	      this.options  = _.extend({}, this.defaults, options);
 	  
-	      // proxy behavior $ method to the view
-	      // this is useful for doing jquery DOM lookups
-	      // scoped to behaviors view.
-	      this.$ = function() {
-	        return this.view.$.apply(this.view, arguments);
-	      };
+	      Marionette.Object.apply(this, arguments);
+	    },
 	  
-	      // Call the initialize method passing
-	      // the arguments from the instance constructor
-	      this.initialize.apply(this, arguments);
+	    // proxy behavior $ method to the view
+	    // this is useful for doing jquery DOM lookups
+	    // scoped to behaviors view.
+	    $: function() {
+	      return this.view.$.apply(this.view, arguments);
+	    },
+	  
+	    // Stops the behavior from listening to events.
+	    // Overrides Object#destroy to prevent additional events from being triggered.
+	    destroy: function() {
+	      this.stopListening();
+	    },
+	  
+	    proxyViewProperties: function (view) {
+	      this.$el = view.$el;
+	      this.el = view.el;
 	    }
-	  
-	    _.extend(Behavior.prototype, Backbone.Events, {
-	      initialize: function() {},
-	  
-	      // stopListening to behavior `onListen` events.
-	      destroy: function() {
-	        this.stopListening();
-	      },
-	  
-	      proxyViewProperties: function (view) {
-	        this.$el = view.$el;
-	        this.el = view.el;
-	      },
-	  
-	      // import the `triggerMethod` to trigger events with corresponding
-	      // methods if the method exists
-	      triggerMethod: Marionette.triggerMethod,
-	  
-	      // Proxy `getOption` to enable getting options from this or this.options by name.
-	      getOption: Marionette.proxyGetOption,
-	  
-	      // Proxy `unbindEntityEvents` to enable binding view's events from another entity.
-	      bindEntityEvents: Marionette.proxyBindEntityEvents,
-	  
-	      // Proxy `unbindEntityEvents` to enable unbinding view's events from another entity.
-	      unbindEntityEvents: Marionette.proxyUnbindEntityEvents
-	    });
-	  
-	    // Borrow Backbones extend implementation
-	    // this allows us to setup a proper
-	    // inheritance pattern that follows suit
-	    // with the rest of Marionette views.
-	    Behavior.extend = Marionette.extend;
-	  
-	    return Behavior;
-	  })(_, Backbone);
+	  });
 	  
 	  /* jshint maxlen: 143 */
-	  // Marionette.Behaviors
-	  // --------
+	  // Behaviors
+	  // ---------
 	  
 	  // Behaviors is a utility class that takes care of
 	  // gluing your behavior instances to their given View.
@@ -18928,8 +19005,8 @@
 	  })(Marionette, _);
 	  
 	
-	  // AppRouter
-	  // ---------
+	  // App Router
+	  // ----------
 	  
 	  // Reduce the boilerplate code of handling route events
 	  // and then calling a single method on another object.
@@ -18949,9 +19026,9 @@
 	  Marionette.AppRouter = Backbone.Router.extend({
 	  
 	    constructor: function(options) {
-	      Backbone.Router.apply(this, arguments);
-	  
 	      this.options = options || {};
+	  
+	      Backbone.Router.apply(this, arguments);
 	  
 	      var appRoutes = this.getOption('appRoutes');
 	      var controller = this._getController();
@@ -18969,11 +19046,10 @@
 	    // process the route event and trigger the onRoute
 	    // method call, if it exists
 	    _processOnRoute: function(routeName, routeArgs) {
-	      // find the path that matched
-	      var routePath = _.invert(this.getOption('appRoutes'))[routeName];
-	  
-	      // make sure an onRoute is there, and call it
+	      // make sure an onRoute before trying to call it
 	      if (_.isFunction(this.onRoute)) {
+	        // find the path that matches the current route
+	        var routePath = _.invert(this.getOption('appRoutes'))[routeName];
 	        this.onRoute(routeName, routePath, routeArgs);
 	      }
 	    },
@@ -19006,7 +19082,13 @@
 	    },
 	  
 	    // Proxy `getOption` to enable getting options from this or this.options by name.
-	    getOption: Marionette.proxyGetOption
+	    getOption: Marionette.proxyGetOption,
+	  
+	    triggerMethod: Marionette.triggerMethod,
+	  
+	    bindEntityEvents: Marionette.proxyBindEntityEvents,
+	  
+	    unbindEntityEvents: Marionette.proxyUnbindEntityEvents
 	  });
 	  
 	  // Application
@@ -19015,20 +19097,15 @@
 	  // Contain and manage the composite application as a whole.
 	  // Stores and starts up `Region` objects, includes an
 	  // event aggregator as `app.vent`
-	  Marionette.Application = function(options) {
-	    this.options = options;
-	    this._initializeRegions(options);
-	    this._initCallbacks = new Marionette.Callbacks();
-	    this.submodules = {};
-	    _.extend(this, options);
-	    this._initChannel();
-	    this.initialize.apply(this, arguments);
-	  };
-	  
-	  _.extend(Marionette.Application.prototype, Backbone.Events, {
-	    // Initialize is an empty function by default. Override it with your own
-	    // initialization logic.
-	    initialize: function() {},
+	  Marionette.Application = Marionette.Object.extend({
+	    constructor: function(options) {
+	      this._initializeRegions(options);
+	      this._initCallbacks = new Marionette.Callbacks();
+	      this.submodules = {};
+	      _.extend(this, options);
+	      this._initChannel();
+	      Marionette.Object.call(this, options);
+	    },
 	  
 	    // Command execution, facilitated by Backbone.Wreqr.Commands
 	    execute: function() {
@@ -19094,9 +19171,7 @@
 	      // Overwrite the module class if the user specifies one
 	      var ModuleClass = Marionette.Module.getClass(moduleDefinition);
 	  
-	      // slice the args, and add this application object as the
-	      // first argument of the array
-	      var args = slice.call(arguments);
+	      var args = _.toArray(arguments);
 	      args.unshift(this);
 	  
 	      // see the Marionette.Module object for more information
@@ -19136,23 +19211,24 @@
 	    // Internal method to set up the region manager
 	    _initRegionManager: function() {
 	      this._regionManager = this.getRegionManager();
+	      this._regionManager._parent = this;
 	  
-	      this.listenTo(this._regionManager, 'before:add:region', function(name) {
-	        this.triggerMethod('before:add:region', name);
+	      this.listenTo(this._regionManager, 'before:add:region', function() {
+	        Marionette._triggerMethod(this, 'before:add:region', arguments);
 	      });
 	  
 	      this.listenTo(this._regionManager, 'add:region', function(name, region) {
 	        this[name] = region;
-	        this.triggerMethod('add:region', name, region);
+	        Marionette._triggerMethod(this, 'add:region', arguments);
 	      });
 	  
-	      this.listenTo(this._regionManager, 'before:remove:region', function(name) {
-	        this.triggerMethod('before:remove:region', name);
+	      this.listenTo(this._regionManager, 'before:remove:region', function() {
+	        Marionette._triggerMethod(this, 'before:remove:region', arguments);
 	      });
 	  
-	      this.listenTo(this._regionManager, 'remove:region', function(name, region) {
+	      this.listenTo(this._regionManager, 'remove:region', function(name) {
 	        delete this[name];
-	        this.triggerMethod('remove:region', name, region);
+	        Marionette._triggerMethod(this, 'remove:region', arguments);
 	      });
 	    },
 	  
@@ -19163,18 +19239,8 @@
 	      this.vent = _.result(this, 'vent') || this.channel.vent;
 	      this.commands = _.result(this, 'commands') || this.channel.commands;
 	      this.reqres = _.result(this, 'reqres') || this.channel.reqres;
-	    },
-	  
-	    // import the `triggerMethod` to trigger events with corresponding
-	    // methods if the method exists
-	    triggerMethod: Marionette.triggerMethod,
-	  
-	    // Proxy `getOption` to enable getting options from this or this.options by name.
-	    getOption: Marionette.proxyGetOption
+	    }
 	  });
-	  
-	  // Copy the `extend` function used by Backbone's classes
-	  Marionette.Application.extend = Marionette.extend;
 	  
 	  /* jshint maxparams: 9 */
 	  
@@ -19263,7 +19329,7 @@
 	  
 	      // stop the sub-modules; depth-first, to make sure the
 	      // sub-modules are stopped / finalized before parents
-	      _.each(this.submodules, function(mod) { mod.stop(); });
+	      _.invoke(this.submodules, 'stop');
 	  
 	      // run the finalizers
 	      this._finalizerCallbacks.run(undefined, this);
@@ -19322,8 +19388,7 @@
 	  
 	      // get the custom args passed in after the module definition and
 	      // get rid of the module name and definition function
-	      var customArgs = slice.call(arguments);
-	      customArgs.splice(0, 3);
+	      var customArgs = _.rest(arguments, 3);
 	  
 	      // Split the module names and get the number of submodules.
 	      // i.e. an example module name of `Doge.Wow.Amaze` would
@@ -19457,7 +19522,7 @@
   \**********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Backbone.Radio v0.6.0
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Backbone.Radio v0.8.4
 	(function(root, factory) {
 	  if (true) {
 	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! backbone */ 3), __webpack_require__(/*! underscore */ 2)], __WEBPACK_AMD_DEFINE_RESULT__ = function(Backbone, _) {
@@ -19475,13 +19540,11 @@
 	}(this, function(Backbone, _) {
 	  'use strict';
 	
-	  var slice = Array.prototype.slice;
-	  
 	  var previousRadio = Backbone.Radio;
 	  
 	  var Radio = Backbone.Radio = {};
 	  
-	  Radio.VERSION = '0.6.0';
+	  Radio.VERSION = '0.8.4';
 	  
 	  // This allows you to run multiple instances of Radio on the same
 	  // webapp. After loading the new version, call `noConflict()` to
@@ -19501,11 +19564,14 @@
 	  // make it throw an Error, for instance. This would make firing a nonexistent event
 	  // have the same consequence as firing a nonexistent method on an Object.
 	  function debugLog(warning, eventName, channelName) {
-	    if (Radio.DEBUG) {
-	      var channelText = channelName ? ' on the ' + channelName + ' channel' : '';
+	    if (!Radio.DEBUG) { return; }
+	    var channelText = channelName ? ' on the ' + channelName + ' channel' : '';
+	    if (console && console.warn) {
 	      console.warn(warning + channelText + ': "' + eventName + '"');
 	    }
 	  }
+	  
+	  var eventSplitter = /\s+/;
 	  
 	  // An internal method used to handle Radio's method overloading for Requests and
 	  // Commands. It's borrowed from Backbone.Events. It differs from Backbone's overload
@@ -19513,18 +19579,75 @@
 	  // event names.
 	  function eventsApi(obj, action, name, rest) {
 	    if (!name) {
-	      return true;
+	      return false;
 	    }
+	  
+	    var results = [];
 	  
 	    // Handle event maps.
 	    if (typeof name === 'object') {
 	      for (var key in name) {
-	        obj[action].apply(obj, [key, name[key]].concat(rest));
+	        results.push(obj[action].apply(obj, [key, name[key]].concat(rest)));
 	      }
-	      return false;
+	      return results;
 	    }
 	  
-	    return true;
+	    // Handle space separated event names.
+	    if (eventSplitter.test(name)) {
+	      var names = name.split(eventSplitter);
+	      for (var i = 0, l = names.length; i < l; i++) {
+	        results.push(obj[action].apply(obj, [names[i]].concat(rest)));
+	      }
+	      return results;
+	    }
+	  
+	    return false;
+	  }
+	  
+	  // An optimized way to execute callbacks.
+	  function callHandler(callback, context, args) {
+	    var a1 = args[0], a2 = args[1], a3 = args[2];
+	    switch(args.length) {
+	      case 0: return callback.call(context);
+	      case 1: return callback.call(context, a1);
+	      case 2: return callback.call(context, a1, a2);
+	      case 3: return callback.call(context, a1, a2, a3);
+	      default: return callback.apply(context, args);
+	    }
+	  }
+	  
+	  // A helper used by `off` methods to the handler from the store
+	  function removeHandler(store, name, callback, context) {
+	    var event = store[name];
+	    if (
+	       (!callback || (callback === event.callback || callback === event.callback._callback)) &&
+	       (!context || (context === event.context))
+	    ) {
+	      delete store[name];
+	      return true;
+	    }
+	  }
+	  
+	  function removeHandlers(store, name, callback, context) {
+	    store || (store = {});
+	    var names = name ? [name] : _.keys(store);
+	    var matched = false;
+	  
+	    for (var i = 0, length = names.length; i < length; i++) {
+	      name = names[i];
+	  
+	      // If there's no event by this name, log it and continue
+	      // with the loop
+	      if (!store[name]) {
+	        continue;
+	      }
+	  
+	      if (removeHandler(store, name, callback, context)) {
+	        matched = true;
+	      }
+	    }
+	  
+	    return matched;
 	  }
 	  
 	  /*
@@ -19546,7 +19669,7 @@
 	  
 	    // Log information about the channel and event
 	    log: function(channelName, eventName) {
-	      var args = slice.call(arguments, 2);
+	      var args = _.rest(arguments, 2);
 	      console.log('[' + channelName + '] "' + eventName + '"', args);
 	    },
 	  
@@ -19578,11 +19701,11 @@
 	   */
 	  
 	  Radio.Commands = {
-	    
+	  
 	    // Issue a command
 	    command: function(name) {
-	      var args = slice.call(arguments, 1);
-	      if (!eventsApi(this, 'command', name, args)) {
+	      var args = _.rest(arguments);
+	      if (eventsApi(this, 'command', name, args)) {
 	        return this;
 	      }
 	      var channelName = this.channelName;
@@ -19597,7 +19720,7 @@
 	      if (commands && (commands[name] || commands['default'])) {
 	        var handler = commands[name] || commands['default'];
 	        args = commands[name] ? args : arguments;
-	        handler.callback.apply(handler.context, args);
+	        callHandler(handler.callback, handler.context, args);
 	      } else {
 	        debugLog('An unhandled command was fired', name, channelName);
 	      }
@@ -19607,10 +19730,14 @@
 	  
 	    // Register a handler for a command.
 	    comply: function(name, callback, context) {
-	      if (!eventsApi(this, 'comply', name, [callback, context])) {
+	      if (eventsApi(this, 'comply', name, [callback, context])) {
 	        return this;
 	      }
 	      this._commands || (this._commands = {});
+	  
+	      if (this._commands[name]) {
+	        debugLog('A command was overwritten', name, this.channelName);
+	      }
 	  
 	      this._commands[name] = {
 	        callback: callback,
@@ -19622,7 +19749,7 @@
 	  
 	    // Register a handler for a command that happens just once.
 	    complyOnce: function(name, callback, context) {
-	      if (!eventsApi(this, 'complyOnce', name, [callback, context])) {
+	      if (eventsApi(this, 'complyOnce', name, [callback, context])) {
 	        return this;
 	      }
 	      var self = this;
@@ -19636,17 +19763,15 @@
 	    },
 	  
 	    // Remove handler(s)
-	    stopComplying: function(name) {
-	      if (!eventsApi(this, 'stopComplying', name)) {
+	    stopComplying: function(name, callback, context) {
+	      if (eventsApi(this, 'stopComplying', name)) {
 	        return this;
 	      }
-	      var store = this._commands;
 	  
-	      if (!name) {
+	      // Remove everything if there are no arguments passed
+	      if (!name && !callback && !context) {
 	        delete this._commands;
-	      } else if (store && store[name]) {
-	        delete store[name];
-	      } else {
+	      } else if (!removeHandlers(this._commands, name, callback, context)) {
 	        debugLog('Attempted to remove the unregistered command', name, this.channelName);
 	      }
 	  
@@ -19662,14 +19787,18 @@
 	   */
 	  
 	  function makeCallback(callback) {
-	    return _.isFunction(callback) ? callback : _.constant(callback);
+	    return _.isFunction(callback) ? callback : function () { return callback; };
 	  }
 	  
 	  Radio.Requests = {
 	  
 	    // Make a request
 	    request: function(name) {
-	      var args = slice.call(arguments, 1);
+	      var args = _.rest(arguments);
+	      var results = eventsApi(this, 'request', name, args);
+	      if (results) {
+	        return results;
+	      }
 	      var channelName = this.channelName;
 	      var requests = this._requests;
 	  
@@ -19682,7 +19811,7 @@
 	      if (requests && (requests[name] || requests['default'])) {
 	        var handler = requests[name] || requests['default'];
 	        args = requests[name] ? args : arguments;
-	        return handler.callback.apply(handler.context, args);
+	        return callHandler(handler.callback, handler.context, args);
 	      } else {
 	        debugLog('An unhandled request was fired', name, channelName);
 	      }
@@ -19690,11 +19819,15 @@
 	  
 	    // Set up a handler for a request
 	    reply: function(name, callback, context) {
-	      if (!eventsApi(this, 'reply', name, [callback, context])) {
+	      if (eventsApi(this, 'reply', name, [callback, context])) {
 	        return this;
 	      }
 	  
 	      this._requests || (this._requests = {});
+	  
+	      if (this._requests[name]) {
+	        debugLog('A request was overwritten', name, this.channelName);
+	      }
 	  
 	      this._requests[name] = {
 	        callback: makeCallback(callback),
@@ -19706,7 +19839,7 @@
 	  
 	    // Set up a handler that can only be requested once
 	    replyOnce: function(name, callback, context) {
-	      if (!eventsApi(this, 'replyOnce', name, [callback, context])) {
+	      if (eventsApi(this, 'replyOnce', name, [callback, context])) {
 	        return this;
 	      }
 	  
@@ -19721,18 +19854,15 @@
 	    },
 	  
 	    // Remove handler(s)
-	    stopReplying: function(name) {
-	      if (!eventsApi(this, 'stopReplying', name)) {
+	    stopReplying: function(name, callback, context) {
+	      if (eventsApi(this, 'stopReplying', name)) {
 	        return this;
 	      }
 	  
-	      var store = this._requests;
-	  
-	      if (!name) {
+	      // Remove everything if there are no arguments passed
+	      if (!name && !callback && !context) {
 	        delete this._requests;
-	      } else if (store && store[name]) {
-	        delete store[name];
-	      } else {
+	      } else if (!removeHandlers(this._requests, name, callback, context)) {
 	        debugLog('Attempted to remove the unregistered request', name, this.channelName);
 	      }
 	  
@@ -19753,7 +19883,12 @@
 	    if (!channelName) {
 	      throw new Error('You must provide a name for the channel.');
 	    }
-	    return Radio._channels[channelName] || new Radio.Channel(channelName);
+	  
+	    if (Radio._channels[channelName]) {
+	      return Radio._channels[channelName];
+	    } else {
+	      return (Radio._channels[channelName] = new Radio.Channel(channelName));
+	    }
 	  };
 	  
 	  /*
@@ -19766,7 +19901,6 @@
 	  
 	  Radio.Channel = function(channelName) {
 	    this.channelName = channelName;
-	    Radio._channels[channelName] = this;
 	  };
 	  
 	  _.extend(Radio.Channel.prototype, Backbone.Events, Radio.Commands, Radio.Requests, {
@@ -19789,12 +19923,12 @@
 	   *
 	   */
 	  
-	   var channel, args, systems = [Backbone.Events, Radio.Commands, Radio.Requests];
+	  var channel, args, systems = [Backbone.Events, Radio.Commands, Radio.Requests];
 	  
-	   _.each(systems, function(system) {
+	  _.each(systems, function(system) {
 	    _.each(system, function(method, methodName) {
 	      Radio[methodName] = function(channelName) {
-	        args = slice.call(arguments, 1);
+	        args = _.rest(arguments);
 	        channel = this.channel(channelName);
 	        return channel[methodName].apply(channel, args);
 	      };
