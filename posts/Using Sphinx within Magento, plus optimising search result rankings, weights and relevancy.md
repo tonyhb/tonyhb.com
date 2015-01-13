@@ -29,44 +29,44 @@ configuration files in /usr/local/etc/
 
 There are a **lot** of configuration options for Sphinx, most of which we don’t need to worry about. Here’s my /usr/local/etc/sphinx.conf file that’s working a treat (we’ll cover the sql query after):
 
-    source magento_fulltext {
-        type = mysql
+<pre><code data-language="">source magento_fulltext {
+    type = mysql
 
-        # Host details - ensure you update this to match your settings
-        sql_host = localhost
-        sql_user = {username}
-        sql_pass = {password}
-        sql_db   = {database name}
-        sql_port = 3306
-        sql_sock = /var/lib/mysql/mysql.sock          # Either leave this out for TCP (slightly slower) or update to your sock path!
+    # Host details - ensure you update this to match your settings
+    sql_host = localhost
+    sql_user = {username}
+    sql_pass = {password}
+    sql_db   = {database name}
+    sql_port = 3306
+    sql_sock = /var/lib/mysql/mysql.sock          # Either leave this out for TCP (slightly slower) or update to your sock path!
 
-        # Core settings
-        sql_query_pre  = SET NAMES utf8               # We're using UTF-8 encoding so run this before
-        sql_query      = SELECT product_id, name, name_attributes, category, data_index FROM sphinx_catalogsearch_fulltext
-        sql_query_info = SELECT product_id, name, name_attributes, category, data_index FROM sphinx_catalogsearch_fulltext WHERE product_id=$id
-    }
+    # Core settings
+    sql_query_pre  = SET NAMES utf8               # We're using UTF-8 encoding so run this before
+    sql_query      = SELECT product_id, name, name_attributes, category, data_index FROM sphinx_catalogsearch_fulltext
+    sql_query_info = SELECT product_id, name, name_attributes, category, data_index FROM sphinx_catalogsearch_fulltext WHERE product_id=$id
+}
 
-    index fulltext {
-        source = magento_fulltext
-        path   = /var/data/production.sphinx.index     # Feel free to change
+index fulltext {
+    source = magento_fulltext
+    path   = /var/data/production.sphinx.index     # Feel free to change
 
-        morphology   = stem_en, metaphone
-        min_word_len = 1                               # Indexes all words
-        charset_type = utf-8
-        blend_chars  = -                               # This presumes people won't type a hyphen into the search bar: quite likely
-        blend_mode   = trim_both                       #
-        html_strip   = 1                               # Just in case anyone tries to get clever in the admin panel and use HTML
-    }
+    morphology   = stem_en, metaphone
+    min_word_len = 1                               # Indexes all words
+    charset_type = utf-8
+    blend_chars  = -                               # This presumes people won't type a hyphen into the search bar: quite likely
+    blend_mode   = trim_both                       #
+    html_strip   = 1                               # Just in case anyone tries to get clever in the admin panel and use HTML
+}
 
-    indexer {
-        mem_limit = 1024M                              # Change this to something that suits your server
-    }
+indexer {
+    mem_limit = 1024M                              # Change this to something that suits your server
+}
 
-    searchd {
-        read_timeout    = 5
-        client_timeout  = 10                           # Make sure you get rid of the 5 minute timeout!
-        preopen_indexes = 1
-    }
+searchd {
+    read_timeout    = 5
+    client_timeout  = 10                           # Make sure you get rid of the 5 minute timeout!
+    preopen_indexes = 1
+}</pre></code>
 
 The main things to take note of here are that we’re indexing all words, using stem_en and metaphone morphology to ensure plurals and misspellings/variants are included and that we’re **using a new catalog search table.**
 
@@ -85,16 +85,17 @@ The product name is definitely the most important: if you’re selling a ‘Gala
 
 Knowing this, we need to add an extra table to our database which adds three columns to the catalogsearch_fulltext table and modify the fulltext search indexer to create these columns for us. Here’s the SQL to create our table:
 
-    CREATE TABLE `sphinx_catalogsearch_fulltext` (
-      `product_id` int(10) unsigned NOT NULL,
-      `store_id` smallint(5) unsigned NOT NULL,
-      `name` varchar(255) NOT NULL,
-      `name_attributes` longtext NOT NULL,
-      `category` varchar(255) NOT NULL,
-      `data_index` longtext NOT NULL,
-      PRIMARY KEY (`product_id`,`store_id`),
-      FULLTEXT KEY `data_index` (`data_index`)
-    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+<pre><code data-language="sql">CREATE TABLE `sphinx_catalogsearch_fulltext` (
+  `product_id` int(10) unsigned NOT NULL,
+  `store_id` smallint(5) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `name_attributes` longtext NOT NULL,
+  `category` varchar(255) NOT NULL,
+  `data_index` longtext NOT NULL,
+  PRIMARY KEY (`product_id`,`store_id`),
+  FULLTEXT KEY `data_index` (`data_index`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+</code></pre>
 
 ##  Indexing our new search fields
 
@@ -120,47 +121,47 @@ Third, we ensured the product’s entity ID was passed to the helper in the `pre
 
 This is easier than it sounds and is included in the above Gist ([here’s the link again](https://gist.github.com/2727341)). The actual Sphinx logic starts at line 313 (line 56 of the Gist), in the method prepareResult:
 
-<pre><code data-language="php">    define('SPH_RANK_SPH04', 7);
-    define('SPH_RANK_WORDCOUNT', 3);
+<pre><code data-language="php">define('SPH_RANK_SPH04', 7);
+define('SPH_RANK_WORDCOUNT', 3);
 
-    // Connect to our Sphinx Search Engine and run our queries
-    $sphinx = new SphinxClient();
-    $sphinx->SetServer('192.168.100.88', 9312);
-    $sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
-    $sphinx->setFieldWeights(array(
-        'name' => 7,
-        'category' => 1,
-        'name_attributes' => 3,
-        'data_index' => 1
-    ));
-    $sphinx->setLimits(0, 200, 1000, 5000);
+// Connect to our Sphinx Search Engine and run our queries
+$sphinx = new SphinxClient();
+$sphinx->SetServer('192.168.100.88', 9312);
+$sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
+$sphinx->setFieldWeights(array(
+    'name' => 7,
+    'category' => 1,
+    'name_attributes' => 3,
+    'data_index' => 1
+));
+$sphinx->setLimits(0, 200, 1000, 5000);
 
-    // $sphinx->SetRankingMode(SPH_RANK_SPH04, 7);
-    $sphinx->SetRankingMode(SPH_RANK_PROXIMITY_BM25);
-    $sphinx->AddQuery($queryText, "fulltext");
-    $results = $sphinx->RunQueries();
+// $sphinx->SetRankingMode(SPH_RANK_SPH04, 7);
+$sphinx->SetRankingMode(SPH_RANK_PROXIMITY_BM25);
+$sphinx->AddQuery($queryText, "fulltext");
+$results = $sphinx->RunQueries();
 
-    // Loop through our Sphinx results
-    foreach ($results as $item)
+// Loop through our Sphinx results
+foreach ($results as $item)
+{
+    if (empty($item['matches']))
+        continue;
+
+    foreach ($item['matches'] as $doc => $docinfo)
     {
-        if (empty($item['matches']))
-            continue;
-
-        foreach ($item['matches'] as $doc => $docinfo)
-        {
-            // Ensure we log query results into the Magento table.
-            $sql = sprintf("INSERT INTO `{$this->getTable('catalogsearch/result')}` "
-                    . " (`query_id`, `product_id`, `relevance`) VALUES "
-                    . " (%d, %d, %f) "
-                    . " ON DUPLICATE KEY UPDATE `relevance` = %f",
-                $query->getId(),
-                $doc,
-                $docinfo['weight']/1000,
-                $docinfo['weight']/1000
-            );
-            $this->_getWriteAdapter()->query($sql, $bind);
-        }
+        // Ensure we log query results into the Magento table.
+        $sql = sprintf("INSERT INTO `{$this->getTable('catalogsearch/result')}` "
+                . " (`query_id`, `product_id`, `relevance`) VALUES "
+                . " (%d, %d, %f) "
+                . " ON DUPLICATE KEY UPDATE `relevance` = %f",
+            $query->getId(),
+            $doc,
+            $docinfo['weight']/1000,
+            $docinfo['weight']/1000
+        );
+        $this->_getWriteAdapter()->query($sql, $bind);
     }
+}
 </code></pre>
  
 (There are two definitions to Sphinx search ranking algorithms because in my Sphinx extension these weren’t defined.)

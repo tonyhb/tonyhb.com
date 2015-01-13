@@ -18,21 +18,22 @@ with a couple ideas about how to do it.
 
 This is it, in essence:
 
-	  class Capybara::Session
-		def wait_until(timeout = Capybara.default_wait_time)
-		  Timeout.timeout(timeout) do
-			sleep(0.05) until value = yield
-			value
-		  end
-		end
-	  end
+<pre><code data-language="ruby">class Capybara::Session
+  def wait_until(timeout = Capybara.default_wait_time)
+    Timeout.timeout(timeout) do
+  	sleep(0.05) until value = yield
+  	value
+    end
+  end
+end
 
-	  def wait_for_ajax(timeout = Capybara.default_wait_time)
-		page.wait_until(timeout) do
-	      # Luckily, $.active counts the # of ajax requests. Wait for it to get to 0
-		  page.evaluate_script '(typeof jQuery === "undefined") || (jQuery && jQuery.active == 0)'
-		end
-	  end
+def wait_for_ajax(timeout = Capybara.default_wait_time)
+  page.wait_until(timeout) do
+    # Luckily, $.active counts the # of ajax requests. Wait for it to get to 0
+    page.evaluate_script '(typeof jQuery === "undefined") || (jQuery && jQuery.active == 0)'
+  end
+end
+</code></pre>
 
 Holy shit do *not* do this. It's a great start, but you'll hate yourself for it later. Here's why:
 
@@ -52,102 +53,103 @@ Here's how you get an improvement over the easy fix:
 
 And here's an implementation:
 
-    # lib/rack_request_counter.rb
-    #
-    # Source, which use jruby and atomic:
-    # http://blog.salsify.com/engineering/tearing-capybara-ajax-tests
-    # https://gist.githubusercontent.com/jturkel/9317269/raw/rack_request_blocker.rb
-    class RackRequestCounter
-    
-      @@num_active_requests = 0
-      @@nil_requests_at = Time.now
-    
-      def self.reset
-    	@@nil_requests_at = Time.now
-    	@@num_active_requests = 0
-      end
-    
-      # Returns the number of requests the server is currently processing.
-      def self.num_active_requests
-    	@@num_active_requests
-      end
-    
-      def self.nil_requests_at
-    	@@nil_requests_at
-      end
-    
-      # 503 status.
-      def initialize(app)
-    	@app = app
-      end
-    
-      def call(env)
-    	puts "Hit: #{env["PATH_INFO"]}" if ENV["SHOW_URLS"]
-    	increment_active_requests
-    	@app.call(env)
-      ensure
-    	decrement_active_requests
-      end
-    
-      private
-    
-      def increment_active_requests
-    	@@num_active_requests += 1
-      end
-    
-      def decrement_active_requests
-    	@@num_active_requests -= 1
-    
-    	# Mark this as the last time there were zero requests
-    	@@nil_requests_at = Time.now if @@num_active_requests == 0
-      end
-    
-    end
-    
-    # spec/support/click.rb
-    module Capybara
-      module Node
-    	class Element < Base
-    
-    	  # Override the default implementation of click so that whenever we click
-    	  # on something, we also wait for any ajax requests to finish.
-    	  def click
-    		synchronize { base.click }
-    		wait_for_ajax
-    	  end
-    
-    	end
-      end
-    end
-    
-    # spec/support/wait_for.rb
-    #
-    # Coupled with a Ruby-side request counter: see /lib/rack_request.counter.rb
-    
-    class Capybara::Session
-      def wait_until(timeout = Capybara.default_wait_time)
-    	Timeout.timeout(timeout) do
-    	  sleep(0.05) until value = yield
-    	  value
-    	end
-      end
-    end
-    
-    # If this is called in a scenario from rspec page will be defined. However,
-    # we've also overridden Capybara's default 'click' behaviour to also call
-    # wait_for_ajax; this means we need to load the current session from Capybara.
-    def wait_for_ajax(timeout = Capybara.default_wait_time)
-      page ||= Capybara.current_session
-    
-      # After clicking, wait 50ms for an ajax request to fire off
-      sleep(0.05)
-      page.wait_until(timeout) do
-    	# If there are no active requests and the last request was over 150ms ago,
-    	# continue. This means that one AJAX request wasn't depending on another to
-    	# finish... race condition central.com
-    	RackRequestCounter.num_active_requests <= 0 && Time.now - RackRequestCounter.nil_requests_at > 0.15
-      end
-    end
+<pre><code data-language="ruby">lib/rack_request_counter.rb
+#
+# Source, which use jruby and atomic:
+# http://blog.salsify.com/engineering/tearing-capybara-ajax-tests
+# https://gist.githubusercontent.com/jturkel/9317269/raw/rack_request_blocker.rb
+class RackRequestCounter
+
+  @@num_active_requests = 0
+  @@nil_requests_at = Time.now
+
+  def self.reset
+	@@nil_requests_at = Time.now
+	@@num_active_requests = 0
+  end
+
+  # Returns the number of requests the server is currently processing.
+  def self.num_active_requests
+	@@num_active_requests
+  end
+
+  def self.nil_requests_at
+	@@nil_requests_at
+  end
+
+  # 503 status.
+  def initialize(app)
+	@app = app
+  end
+
+  def call(env)
+	puts "Hit: #{env["PATH_INFO"]}" if ENV["SHOW_URLS"]
+	increment_active_requests
+	@app.call(env)
+  ensure
+	decrement_active_requests
+  end
+
+  private
+
+  def increment_active_requests
+	@@num_active_requests += 1
+  end
+
+  def decrement_active_requests
+	@@num_active_requests -= 1
+
+	# Mark this as the last time there were zero requests
+	@@nil_requests_at = Time.now if @@num_active_requests == 0
+  end
+
+end
+
+# spec/support/click.rb
+module Capybara
+  module Node
+	class Element < Base
+
+	  # Override the default implementation of click so that whenever we click
+	  # on something, we also wait for any ajax requests to finish.
+	  def click
+		synchronize { base.click }
+		wait_for_ajax
+	  end
+
+	end
+  end
+end
+
+# spec/support/wait_for.rb
+#
+# Coupled with a Ruby-side request counter: see /lib/rack_request.counter.rb
+
+class Capybara::Session
+  def wait_until(timeout = Capybara.default_wait_time)
+	Timeout.timeout(timeout) do
+	  sleep(0.05) until value = yield
+	  value
+	end
+  end
+end
+
+# If this is called in a scenario from rspec page will be defined. However,
+# we've also overridden Capybara's default 'click' behaviour to also call
+# wait_for_ajax; this means we need to load the current session from Capybara.
+def wait_for_ajax(timeout = Capybara.default_wait_time)
+  page ||= Capybara.current_session
+
+  # After clicking, wait 50ms for an ajax request to fire off
+  sleep(0.05)
+  page.wait_until(timeout) do
+	# If there are no active requests and the last request was over 150ms ago,
+	# continue. This means that one AJAX request wasn't depending on another to
+	# finish... race condition central.com
+	RackRequestCounter.num_active_requests <= 0 && Time.now - RackRequestCounter.nil_requests_at > 0.15
+  end
+end
+</code></pre>
 
 [Check the gist by clicking on this handy underlined text](https://gist.github.com/tonyhb/dfd8da6522b93a45e377)
 
