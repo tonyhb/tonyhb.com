@@ -1,6 +1,10 @@
+B = require('backbone')
 M = require('marionette')
 Radio = require('radio')
 Mustache = require('mustache')
+
+if window.__agent?
+  window.__agent.start(B, M)
 
 # Disable marionette's standard template cache: by default it looks for a HTML
 # element with an ID provided.

@@ -7,4 +7,4 @@ module.exports = M.ItemView.extend
   events:
     "click h1": "navigate"
   navigate: ->
-    Radio.channel('router').command 'navigate', 'post', @model.get('Slug')
+    Radio.channel('router').command 'navigate', 'showPostContent', @model.get('Slug')

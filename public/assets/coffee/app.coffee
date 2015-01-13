@@ -48,7 +48,7 @@ app.on 'start', ->
   B.history.start({pushState: true, root: "/", silent: false})
 
   $("#home").on 'click', ->
-    Radio.channel('router').command 'navigate', 'home'
+    Radio.channel('router').command 'navigate', 'showHome'
 
 
 # Start our application

@@ -88,7 +88,7 @@
 	    silent: false
 	  });
 	  return $("#home").on('click', function() {
-	    return Radio.channel('router').command('navigate', 'home');
+	    return Radio.channel('router').command('navigate', 'showHome');
 	  });
 	});
 	
@@ -20557,13 +20557,19 @@
   \*****************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var M, Mustache, Radio, defaultDelegateEvents, defaultUndelegateEvents;
+	var B, M, Mustache, Radio, defaultDelegateEvents, defaultUndelegateEvents;
+	
+	B = __webpack_require__(/*! backbone */ 3);
 	
 	M = __webpack_require__(/*! marionette */ 4);
 	
 	Radio = __webpack_require__(/*! radio */ 5);
 	
 	Mustache = __webpack_require__(/*! mustache */ 6);
+	
+	if (window.__agent != null) {
+	  window.__agent.start(B, M);
+	}
 	
 	M.TemplateCache.prototype.loadTemplate = function(tplID) {
 	  return tplID;
@@ -20651,7 +20657,7 @@
   \**********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var M, PostCollection, PostCollectionView, PostContentView, Radio, blog;
+	var M, PostCollection, PostCollectionView, PostContentView, PostSummaryView, Radio, blog;
 	
 	M = __webpack_require__(/*! marionette */ 4);
 	
@@ -20659,7 +20665,9 @@
 	
 	PostCollectionView = __webpack_require__(/*! blog/views/homePostCollectionView */ 17);
 	
-	PostContentView = __webpack_require__(/*! blog/views/postItemView */ 18);
+	PostContentView = __webpack_require__(/*! blog/views/postContentItemView */ 26);
+	
+	PostSummaryView = __webpack_require__(/*! blog/views/postSummaryItemView */ 27);
 	
 	PostCollection = __webpack_require__(/*! collections/post */ 19);
 	
@@ -20668,7 +20676,8 @@
 	  Router: M.AppRouter.extend({
 	    appRoutes: {
 	      "": "showHome",
-	      ":post": "showPost"
+	      ":post": "showPostContent",
+	      ":post/summary": "showPostSummary"
 	    }
 	  }),
 	  Controller: M.Controller.extend({
@@ -20685,31 +20694,47 @@
 	        }));
 	      });
 	    },
-	    showPost: function(url) {
+	    showPostContent: function(url) {
 	      var promise;
 	      if (this._region == null) {
 	        this._region = Radio.channel('regions').request('content');
 	      }
-	      if (this._findAndShowPost(url)) {
+	      if (this._findAndShowPost(url, PostContentView, this._region)) {
 	        return;
 	      }
 	      promise = blog.collection.fetch();
 	      return promise.then((function(_this) {
 	        return function() {
-	          if (_this._findAndShowPost(url)) {
+	          if (_this._findAndShowPost(url, PostContentView, _this._region)) {
 	
 	          }
 	        };
 	      })(this));
 	    },
-	    _findAndShowPost: function(slug) {
+	    showPostSummary: function(url) {
+	      var promise;
+	      if (this._region == null) {
+	        this._region = Radio.channel('regions').request('content');
+	      }
+	      if (this._findAndShowPost(url, PostSummaryView, this._region)) {
+	        return;
+	      }
+	      promise = blog.collection.fetch();
+	      return promise.then((function(_this) {
+	        return function() {
+	          if (_this._findAndShowPost(url, PostSummaryView, _this._region)) {
+	
+	          }
+	        };
+	      })(this));
+	    },
+	    _findAndShowPost: function(slug, View, region) {
 	      var post;
-	      this._region = this._region || Radio.channel('regions').request('content');
 	      post = blog.collection.findWhere({
 	        Slug: slug
 	      });
 	      if (post) {
-	        this._region.show(new PostContentView({
+	        this._region.show(new View({
 	          model: post
 	        }));
 	      }
@@ -20724,12 +20749,19 @@
 	  controller: blog.controller
 	});
 	
-	Radio.channel('router').on('post', function(slug) {
-	  blog.controller.showPost(slug);
+	Radio.channel('router').on('showPostContent', function(slug) {
+	  debugger;
+	  blog.controller.showPostContent(slug);
 	  return blog.router.navigate(slug);
 	});
 	
-	Radio.channel('router').on('home', function() {
+	Radio.channel('router').on('showPostSummary', function(slug) {
+	  debugger;
+	  blog.controller.showPostSummary(slug);
+	  return blog.router.navigate(slug + "/summary");
+	});
+	
+	Radio.channel('router').on('showHome', function() {
 	  blog.controller.showHome();
 	  return blog.router.navigate("/");
 	});
@@ -20756,36 +20788,7 @@
 
 
 /***/ },
-/* 18 */
-/*!*************************************************************!*\
-  !*** ./public/assets/coffee/blog/views/postItemView.coffee ***!
-  \*************************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var M, tpl;
-	
-	M = __webpack_require__(/*! marionette */ 4);
-	
-	tpl = __webpack_require__(/*! html!blog/html/postItemView.html */ 23);
-	
-	module.exports = M.ItemView.extend({
-	  template: tpl,
-	  onShow: function() {
-	    var slug;
-	    slug = this.model.get('Slug');
-	    if (typeof DISQUS !== "undefined" && DISQUS !== null) {
-	      return DISQUS.reset({
-	        reload: true,
-	        config: function() {
-	          return this.page.url = "http://tonyhb.com/" + slug;
-	        }
-	      });
-	    }
-	  }
-	});
-
-
-/***/ },
+/* 18 */,
 /* 19 */
 /*!******************************************************!*\
   !*** ./public/assets/coffee/collections/post.coffee ***!
@@ -20825,7 +20828,7 @@
 	    "click h1": "navigate"
 	  },
 	  navigate: function() {
-	    return Radio.channel('router').command('navigate', 'post', this.model.get('Slug'));
+	    return Radio.channel('router').command('navigate', 'showPostContent', this.model.get('Slug'));
 	  }
 	});
 
@@ -20863,7 +20866,97 @@
   \**************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = "<article>\n  <h1>{{Title}}</h1>\n  <time>{{Date}}</time>\n  {{{Content}}}\n</article>\n\n<hr class=\"comment_separator\" />\n\n<div id=\"disqus_thread\"></div>\n\n<script type=\"text/javascript\">\n  var disqus_shortname = 'tonyhb';\n  (function() {\n   var dsq = document.createElement('script');\n   dsq.type = 'text/javascript';\n   dsq.async = true;\n   dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';\n   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);\n   })();\n </script>\n";
+	module.exports = "<article>\n  <h1>{{Title}}</h1>\n  <time>{{Date}}</time>\n\n  <div class='toggleMode hidden'>\n    <p class='text-center'><a href='#'>{{toggleModeText}}</a></p>\n  </div>\n\n  {{{Content}}}\n</article>\n\n<hr class=\"comment_separator\" />\n\n<div id=\"disqus_thread\"></div>\n\n";
+
+/***/ },
+/* 24 */,
+/* 25 */
+/*!********************************************************************!*\
+  !*** ./~/html-loader!./public/assets/coffee/blog/html/disqus.html ***!
+  \********************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<script type=\"text/javascript\">\n  var disqus_shortname = 'tonyhb';\n  (function() {\n   var dsq = document.createElement('script');\n   dsq.type = 'text/javascript';\n   dsq.async = true;\n   dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';\n   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);\n   })();\n</script>\n";
+
+/***/ },
+/* 26 */
+/*!********************************************************************!*\
+  !*** ./public/assets/coffee/blog/views/postContentItemView.coffee ***!
+  \********************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var M, Radio, disqusTpl, tpl;
+	
+	M = __webpack_require__(/*! marionette */ 4);
+	
+	Radio = __webpack_require__(/*! radio */ 5);
+	
+	tpl = __webpack_require__(/*! html!blog/html/postItemView.html */ 23);
+	
+	disqusTpl = __webpack_require__(/*! html!blog/html/disqus.html */ 25);
+	
+	module.exports = M.ItemView.extend({
+	  template: tpl,
+	  mode: 'full',
+	  ui: {
+	    toggleMode: '.toggleMode'
+	  },
+	  events: {
+	    'click @ui.toggleMode': 'toggleMode'
+	  },
+	  alternativeMode: 'showPostSummary',
+	  toggleMode: function() {
+	    return Radio.channel('router').command('navigate', this.alternativeMode, this.model.get('Slug'));
+	  },
+	  onShow: function() {
+	    if (this.model.get('IsSummarized') === true) {
+	      this.ui.toggleMode.removeClass('hidden');
+	    }
+	    return this.restartDisqus();
+	  },
+	  restartDisqus: function() {
+	    var slug;
+	    slug = this.model.get('Slug');
+	    if (typeof DISQUS !== "undefined" && DISQUS !== null) {
+	      return DISQUS.reset({
+	        reload: true,
+	        config: function() {
+	          return this.page.url = "http://tonyhb.com/" + slug;
+	        }
+	      });
+	    } else {
+	      return this.$el.append(disqusTpl);
+	    }
+	  },
+	  templateHelpers: function() {
+	    return {
+	      toggleModeText: "Show the summary"
+	    };
+	  }
+	});
+
+
+/***/ },
+/* 27 */
+/*!********************************************************************!*\
+  !*** ./public/assets/coffee/blog/views/postSummaryItemView.coffee ***!
+  \********************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var PostContentView;
+	
+	PostContentView = __webpack_require__(/*! blog/views/postContentItemView */ 26);
+	
+	module.exports = PostContentView.extend({
+	  alternativeMode: 'showPostContent',
+	  templateHelpers: function() {
+	    return {
+	      Content: this.model.get('Summary'),
+	      toggleModeText: "Show the full content"
+	    };
+	  }
+	});
+
 
 /***/ }
 /******/ ])
