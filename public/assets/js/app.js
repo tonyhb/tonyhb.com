@@ -21212,13 +21212,11 @@
 	});
 	
 	Radio.channel('router').on('showPostContent', function(slug) {
-	  debugger;
 	  blog.controller.showPostContent(slug);
 	  return blog.router.navigate(slug);
 	});
 	
 	Radio.channel('router').on('showPostSummary', function(slug) {
-	  debugger;
 	  blog.controller.showPostSummary(slug);
 	  return blog.router.navigate(slug + "/summary");
 	});
@@ -22331,7 +22329,6 @@
 	
 	            bypass_defaults[language] = bypass;
 	            language_patterns[language] = patterns.concat(language_patterns[language] || []);
-	            console.log(language_patterns);
 	        },
 	
 	        /**

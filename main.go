@@ -22,7 +22,7 @@ var (
 func init() {
 	var err error
 	log.SetLevel(log.DebugLevel)
-	// log.SetFormatter(&log.JSONFormatter{})
+	log.SetFormatter(&log.JSONFormatter{})
 
 	// Open the YAML file and find out which
 	config, err = yaml.ReadFile("config/go-blog.yaml")

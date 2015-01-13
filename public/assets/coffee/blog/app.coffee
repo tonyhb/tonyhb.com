@@ -62,12 +62,10 @@ blog.controller = new blog.Controller()
 blog.router = new blog.Router({controller: blog.controller})
 
 Radio.channel('router').on 'showPostContent', (slug) ->
-  debugger
   blog.controller.showPostContent(slug)
   blog.router.navigate slug
 
 Radio.channel('router').on 'showPostSummary', (slug) ->
-  debugger
   blog.controller.showPostSummary(slug)
   blog.router.navigate slug + "/summary"
 
