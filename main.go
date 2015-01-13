@@ -20,11 +20,12 @@ var (
 )
 
 func init() {
+	var err error
 	log.SetLevel(log.DebugLevel)
 	// log.SetFormatter(&log.JSONFormatter{})
 
 	// Open the YAML file and find out which
-	config, err := yaml.ReadFile("config/go-blog.yaml")
+	config, err = yaml.ReadFile("config/go-blog.yaml")
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
@@ -94,6 +95,14 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if path[len(path)-8:] == "/summary" {
+		path = path[0 : len(path)-8]
+	}
+
+	if refresh, _ := config.Get("refresh_on_hit"); refresh == "true" {
+		posts.Scan()
+	}
+
 	// @TODO: Use YAML file for handling 301 redirects for old blog posts.
 	//        This can currently be handled by using nginx/apache as a reverse
 	//        proxy and having the web server redirect the client.
@@ -102,13 +111,8 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set the human readable date and our parsed markdown. We're calling
-	// exported struct methods here instead of mustache because, even though
-	// mustache can access them server-side, these methods *aren't* visible
-	// to Backbone/JS. We're using the same templates for the front and back
-	// end, so this is a necessity.
 	post := posts.List[path]
-	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/view.html", "public/templates/layout.html", post))
+	fmt.Fprint(w, mustache.RenderFileInLayout("public/templates/posts/view.html", "public/templates/layout.html", *post))
 }
 
 // Handles 404 errors.
