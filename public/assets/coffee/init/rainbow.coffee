@@ -1,0 +1,8 @@
+window.Rainbow = require('exports?Rainbow!rainbow')
+require('rainbow_generic')
+require('rainbow_go')
+require('rainbow_javascript')
+require('rainbow_php')
+require('rainbow_shell')
+require('rainbow_ruby')
+Rainbow.color()

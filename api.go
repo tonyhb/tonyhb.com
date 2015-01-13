@@ -17,9 +17,7 @@ func apiList(w http.ResponseWriter, r *http.Request) {
 	// noindex http header for le search
 	w.Header().Add("robots", "noindex")
 
-	list := Posts.list()
-
-	json, err := json.Marshal(list)
+	json, err := json.Marshal(posts.order())
 	if err != nil {
 		fmt.Fprint(w, err.Error())
 	}
@@ -38,12 +36,8 @@ func apiPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("robots", "noindex")
 
 	// Find our post
-	path := r.URL.Path[7:]
-	list, _ := Posts.scan()
-	post := list[path]
-	post.Content = post.ParseContent()
-
-	json, _ := json.Marshal(post)
+	slug := r.URL.Path[7:]
+	json, _ := json.Marshal(posts.List[slug])
 
 	fmt.Fprint(w, string(json))
 }

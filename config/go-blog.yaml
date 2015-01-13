@@ -1,1 +1,2 @@
 port: 8000
+refresh_on_hit: true

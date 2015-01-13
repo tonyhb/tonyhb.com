@@ -1,0 +1,25 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "description": "The source for tonyhb.co.uk, using a WIP markdown-based blogging engine in Go.",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tonyhb/tonyhb.co.uk.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tonyhb/tonyhb.co.uk/issues"
+  },
+  "homepage": "https://github.com/tonyhb/tonyhb.co.uk",
+  "devDependencies": {
+    "coffee-loader": "^0.7.2",
+    "coffee-script": "^1.8.0",
+    "exports-loader": "^0.6.2",
+    "html-loader": "^0.2.3"
+  }
+}
