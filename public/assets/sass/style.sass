@@ -10,8 +10,11 @@ $mediumBrown: #3a301e
 $lightBrown: #676767
 $orange: #f27a22
 
+$defaultSize: 15px
+
 html, body, input, textarea
-  font: 200 16px/1.7 "Merriweather", "Baskerville", Georgia, serif
+  font: 200 #{$defaultSize}/1.7 "Merriweather", "Baskerville", Georgia, serif
+  color: #444
 
 .container, #main
   display: block
@@ -76,8 +79,12 @@ html, body, input, textarea
 /**
  * Typography
  **/
+h1, h2, h3, h4
+  font-family: "Source Sans Pro", helvetica, arial, sans-serif
+  font-weight: 600
+
 h1, h1 a
-  font-size: 26px
+  font-size: 36px
   font-weight: 700
   color: $mediumBrown
   line-height: 1.2
@@ -85,6 +92,33 @@ h1, h1 a
   text-align: center
 h1 a:hover
   text-decoration: underline
+
+h2
+  font-size: 28px
+  color: #777
+  margin: 2em 0 1em 0
+  text-align: center
+
+h3
+  margin: 2em 0 .5em 0
+  font-size: 18px
+  color: #777
+
+.toggleMode
+  padding: 1em 10px 3em
+  border-bottom: 1px solid #e5e5e5
+  cursor: pointer
+
+ul
+  list-style: disc
+  margin-left: 35px
+  color: #aaa
+  li
+    color: #555
+    margin: 4px 0
+    ul
+      margin: 10px 0 5px 35px
+
 
 time, .toggleMode
   color: #888
@@ -98,26 +132,11 @@ time + .toggleMode
   margin: -3em 0 4em 0
 
 .toggleMode + p, time + p
-  font-size: 16px
+  font-size: $defaultSize
   margin-bottom: .85em
 
 small
   color: #777
-
-h2
-  font-weight: 700
-  font-size: 20px
-  color: #777
-
-h3
-  font-weight: 700
-  margin-top: 3em
-  text-transform: uppercase
-  letter-spacing: 1px
-  color: #777
-
-h2, h3
-  text-align: center
 
 code, pre
   font-family: monospace
@@ -129,6 +148,7 @@ pre
 
 li code, p code
   background: #fafee2
+  padding: 4px
 
 ol
   list-style: decimal
@@ -140,8 +160,9 @@ ol
 
 /** Margins **/
 
-p + h2, p + hr, hr + p, .comment_separator
+p + hr, hr + p, .comment_separator
   margin-top: 3em
+
 p + p, p + h4, p + h5, p + h6, p + ul, p + ol, p + img, img + p, ul + p, ol + p, .callout, .callout + p
   margin-top: 1.5em
 h2 + p, h3 + p, h4 + p, h5 + p, h6 + p
@@ -152,6 +173,9 @@ li + li
   margin-top: .55em
 li p + p
   margin-top: .55em
+
+ul, ol
+  margin-bottom: 1.5em
 
 p a
   color: inherit
